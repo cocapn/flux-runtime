@@ -242,24 +242,24 @@ class BytecodeEncoder:
         if op_name == "nop":
             return bytes([Op.NOP])
 
-        # ── Binary arithmetic (Format C: [op][rs1:u8][rs2:u8]) ───────────
+        # ── Binary arithmetic (Format E: [op][rd][rs1][rs2]) ───────────
         if op_name in _BIN_ARITH:
             bc_op = _BIN_ARITH[op_name]
-            return struct.pack("<BBB", bc_op, self._vid(instr.lhs), self._vid(instr.rhs))
+            return struct.pack("<BBBB", bc_op, self._vid(instr.lhs), self._vid(instr.rhs), 0)
 
-        # ── Binary comparison (Format C: [op][rs1:u8][rs2:u8]) ──────────
+        # ── Binary comparison (Format E: [op][rd][rs1][rs2]) ──────────
         if op_name in _BIN_CMP:
             bc_op = _BIN_CMP[op_name]
-            return struct.pack("<BBB", bc_op, self._vid(instr.lhs), self._vid(instr.rhs))
+            return struct.pack("<BBBB", bc_op, self._vid(instr.lhs), self._vid(instr.rhs), 0)
 
         # INe → IEQ (same opcode, different semantic at runtime)
         if op_name == "ine":
-            return struct.pack("<BBB", Op.IEQ, self._vid(instr.lhs), self._vid(instr.rhs))
+            return struct.pack("<BBBB", Op.IEQ, self._vid(instr.lhs), self._vid(instr.rhs), 0)
 
-        # ── Unary (Format B: [op][src:u8]) ───────────────────────────────
+        # ── Unary (Format C: [op][rd][src]) ───────────────────────────────
         if op_name in _UNARY:
             bc_op = _UNARY[op_name]
-            return struct.pack("<BB", bc_op, self._vid(instr.lhs))
+            return struct.pack("<BBB", bc_op, 0, self._vid(instr.lhs))
 
         # ── Return ───────────────────────────────────────────────────────
         if op_name == "return":
@@ -291,10 +291,9 @@ class BytecodeEncoder:
             data.extend(default_b)
             return struct.pack("<BH", Op.JMP, len(data)) + bytes(data)
 
-        # ── Call (Format G: [CALL][len][func_name_bytes]) ────────────────
+        # ── Call (Format D: [CALL][0][offset_lo][offset_hi]) ────────────────
         if op_name == "call":
-            fn_b = instr.func.encode("utf-8")
-            return struct.pack("<BH", Op.CALL, len(fn_b)) + fn_b
+            return struct.pack("<BBh", Op.CALL, 0, 0)  # placeholder, resolved by linker
 
         # ── Memory: load (Format C: [LOAD][0][ptr_id]) ──────────────────
         if op_name == "load":
@@ -308,29 +307,29 @@ class BytecodeEncoder:
         if op_name == "alloca":
             return struct.pack("<BB", Op.ALLOCA, 0)
 
-        # ── Memory: getfield → LOAD + field index ────────────────────────
+        # ── Memory: getfield (Format E: [LOAD][rd][src][idx]) ─────────────
         if op_name == "getfield":
             return struct.pack("<BBBB", Op.LOAD, 0, self._vid(instr.struct_val), instr.field_index)
 
-        # ── Memory: setfield → STORE + field index ───────────────────────
+        # ── Memory: setfield (Format E: [STORE][val][src][idx]) ──────────
         if op_name == "setfield":
             return struct.pack("<BBBB", Op.STORE, self._vid(instr.value), self._vid(instr.struct_val), instr.field_index)
 
-        # ── Memory: getelem → LOAD [arr_id][idx_id] ─────────────────────
+        # ── Memory: getelem (Format E: [LOAD][dst][arr][idx]) ────────────
         if op_name == "getelem":
-            return struct.pack("<BBB", Op.LOAD, self._vid(instr.array_val), self._vid(instr.index))
+            return struct.pack("<BBBB", Op.LOAD, 0, self._vid(instr.array_val), self._vid(instr.index))
 
-        # ── Memory: setelem → STORE [val_id][arr_id][idx_id] ────────────
+        # ── Memory: setelem (Format E: [STORE][val][arr][idx]) ───────────
         if op_name == "setelem":
             return struct.pack("<BBBB", Op.STORE, self._vid(instr.value), self._vid(instr.array_val), self._vid(instr.index))
 
-        # ── Memory: memcpy (Format C: [MEMCOPY][src_id][dst_id]) ────────
+        # ── Memory: memcpy (Format E: [MEMCOPY][0][src][dst]) ───────────
         if op_name == "memcpy":
-            return struct.pack("<BBB", Op.MEMCOPY, self._vid(instr.src), self._vid(instr.dst))
+            return struct.pack("<BBBB", Op.MEMCOPY, 0, self._vid(instr.src), self._vid(instr.dst))
 
-        # ── Memory: memset (Format C: [MEMSET][dst_id][value_byte]) ─────
+        # ── Memory: memset (Format E: [MEMSET][0][dst][val]) ────────────
         if op_name == "memset":
-            return struct.pack("<BBB", Op.MEMSET, self._vid(instr.dst), instr.value & 0xFF)
+            return struct.pack("<BBBB", Op.MEMSET, 0, self._vid(instr.dst), instr.value & 0xFF)
 
         # ── Conversion → CAST (Format C: [CAST][src_id][type_id_lo]) ────
         if op_name in _CONV:

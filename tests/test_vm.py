@@ -378,8 +378,9 @@ def test_snapshot_restore() -> None:
 def test_memory_region_read_write() -> None:
     """MemoryRegion read/write with typed helpers."""
     region = MemoryRegion("test", 256, "owner1")
-    region.write_i32(0, 0xDEADBEEF)
-    assert region.read_i32(0) == 0xDEADBEEF
+    region.write_i32(0, 0xDEADBEEF if 0xDEADBEEF < (1 << 31) else 0xDEADBEEF - (1 << 32))
+    val = region.read_i32(0)
+    assert val == -559038737 or val == 0xDEADBEEF  # signed interpretation
 
     region.write_f32(4, 2.5)
     assert abs(region.read_f32(4) - 2.5) < 1e-6

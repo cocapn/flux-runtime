@@ -60,6 +60,11 @@ class Op(IntEnum):
     RET = 0x28
     CALL_IND = 0x29
     TAILCALL = 0x2A
+    MOVI = 0x2B
+    IREM = 0x2C
+    CMP = 0x2D
+    JE = 0x2E
+    JNE = 0x2F
 
     # Memory mgmt (0x30-0x37)
     REGION_CREATE = 0x30
@@ -68,6 +73,8 @@ class Op(IntEnum):
     MEMCOPY = 0x33
     MEMSET = 0x34
     MEMCMP = 0x35
+    JL = 0x36
+    JGE = 0x37
 
     # Type ops (0x38-0x3F)
     CAST = 0x38
@@ -92,6 +99,9 @@ class Op(IntEnum):
     FLE = 0x4A
     FGT = 0x4B
     FGE = 0x4C
+    JG = 0x4D
+    JLE = 0x4E
+    LOAD8 = 0x4F
 
     # SIMD vector ops (0x50-0x5F)
     VLOAD = 0x50
@@ -101,6 +111,7 @@ class Op(IntEnum):
     VMUL = 0x54
     VDIV = 0x55
     VFMA = 0x56  # fused multiply-add
+    STORE8 = 0x57
 
     # A2A protocol (0x60-0x7F)
     TELL = 0x60
@@ -138,31 +149,47 @@ class Op(IntEnum):
 
 
 # ── Opcode classification ──────────────────────────────────────────────────
+# Matches the VM interpreter's actual fetch-decode patterns.
 
 # Format A: 1 byte — opcode only
 FORMAT_A = frozenset({
-    Op.NOP, Op.RET, Op.HALT, Op.YIELD, Op.INEG, Op.FNEG, Op.INOT,
-    Op.DUP, Op.POP, Op.SWAP, Op.DEBUG_BREAK, Op.EMERGENCY_STOP,
+    Op.NOP, Op.RET, Op.HALT, Op.YIELD,
+    Op.DUP, Op.SWAP, Op.DEBUG_BREAK, Op.EMERGENCY_STOP,
 })
 
-# Format B: 2 bytes — opcode + rd:u8
+# Format B: 2 bytes — opcode + reg:u8
 FORMAT_B = frozenset({
     Op.INC, Op.DEC, Op.ENTER, Op.LEAVE,
+    Op.PUSH, Op.POP,
 })
 
-# Format D: 4 bytes — opcode + rs1:u8 + imm16:i16 (signed offset)
+# Format C: 3 bytes — opcode + rd:u8 + rs1:u8
+FORMAT_C = frozenset({
+    Op.MOV, Op.LOAD, Op.STORE, Op.CMP,
+    Op.INEG, Op.FNEG, Op.INOT,
+    Op.LOAD8, Op.STORE8,
+    Op.ALLOCA, Op.CAST,
+})
+
+# Format D: 4 bytes — opcode + reg:u8 + imm16:i16 (signed offset)
 FORMAT_D = frozenset({
     Op.JMP, Op.JZ, Op.JNZ,
+    Op.JE, Op.JNE, Op.JG, Op.JL, Op.JGE, Op.JLE,
+    Op.MOVI, Op.CALL,
 })
 
-# Format E: 5 bytes — opcode + rd:u8 + rs1:u8 + rs2:u8
+# Format E: 4 bytes — opcode + rd:u8 + rs1:u8 + rs2:u8 (ternary ops)
 FORMAT_E = frozenset({
+    Op.IADD, Op.ISUB, Op.IMUL, Op.IDIV, Op.IMOD, Op.IREM,
+    Op.IAND, Op.IOR, Op.IXOR, Op.ISHL, Op.ISHR,
+    Op.FADD, Op.FSUB, Op.FMUL, Op.FDIV,
     Op.VFMA, Op.ICMP,
 })
 
 # Format G: variable — opcode + len:u16 + data:len bytes
 FORMAT_G = frozenset({
     Op.REGION_CREATE, Op.REGION_DESTROY, Op.REGION_TRANSFER,
+    Op.MEMCOPY, Op.MEMSET, Op.MEMCMP,
     Op.TELL, Op.ASK, Op.DELEGATE, Op.DELEGATE_RESULT,
     Op.REPORT_STATUS, Op.REQUEST_OVERRIDE, Op.BROADCAST, Op.REDUCE,
     Op.DECLARE_INTENT, Op.ASSERT_GOAL, Op.VERIFY_OUTCOME,
@@ -171,10 +198,9 @@ FORMAT_G = frozenset({
     Op.CAP_REQUIRE, Op.CAP_REQUEST, Op.CAP_GRANT, Op.CAP_REVOKE,
     Op.BARRIER, Op.SYNC_CLOCK, Op.FORMATION_UPDATE,
     Op.RESOURCE_ACQUIRE, Op.RESOURCE_RELEASE,
-    Op.CALL,
 })
 
-# Everything else (binary arithmetic, memory, etc.) is Format C: 3 bytes
+# Everything else defaults to Format C: 3 bytes
 
 
 def get_format(op: Op) -> str:
@@ -195,4 +221,8 @@ def get_format(op: Op) -> str:
 def instruction_size(op: Op) -> int:
     """Return the fixed size in bytes for an opcode (or -1 for variable)."""
     fmt = get_format(op)
-    return {"A": 1, "B": 2, "C": 3, "D": 4, "E": 5}.get(fmt, -1)
+    return {"A": 1, "B": 2, "C": 3, "D": 4, "E": 4}.get(fmt, -1)
+
+
+# Alias used by the VM interpreter
+opcode_size = instruction_size
