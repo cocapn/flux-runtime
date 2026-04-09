@@ -207,6 +207,10 @@ class IEq(Instruction):
     rhs: Value
     @property
     def opcode(self): return "ieq"
+    @property
+    def result_type(self):
+        from .types import BoolType
+        return BoolType(type_id=-1)
 
 
 @dataclass
@@ -215,6 +219,10 @@ class INe(Instruction):
     rhs: Value
     @property
     def opcode(self): return "ine"
+    @property
+    def result_type(self):
+        from .types import BoolType
+        return BoolType(type_id=-1)
 
 
 @dataclass
@@ -223,6 +231,10 @@ class ILt(Instruction):
     rhs: Value
     @property
     def opcode(self): return "ilt"
+    @property
+    def result_type(self):
+        from .types import BoolType
+        return BoolType(type_id=-1)
 
 
 @dataclass
@@ -231,6 +243,10 @@ class IGt(Instruction):
     rhs: Value
     @property
     def opcode(self): return "igt"
+    @property
+    def result_type(self):
+        from .types import BoolType
+        return BoolType(type_id=-1)
 
 
 @dataclass
@@ -239,6 +255,10 @@ class ILe(Instruction):
     rhs: Value
     @property
     def opcode(self): return "ile"
+    @property
+    def result_type(self):
+        from .types import BoolType
+        return BoolType(type_id=-1)
 
 
 @dataclass
@@ -247,6 +267,10 @@ class IGe(Instruction):
     rhs: Value
     @property
     def opcode(self): return "ige"
+    @property
+    def result_type(self):
+        from .types import BoolType
+        return BoolType(type_id=-1)
 
 
 @dataclass
@@ -255,6 +279,10 @@ class FEq(Instruction):
     rhs: Value
     @property
     def opcode(self): return "feq"
+    @property
+    def result_type(self):
+        from .types import BoolType
+        return BoolType(type_id=-1)
 
 
 @dataclass
@@ -263,6 +291,10 @@ class FLt(Instruction):
     rhs: Value
     @property
     def opcode(self): return "flt"
+    @property
+    def result_type(self):
+        from .types import BoolType
+        return BoolType(type_id=-1)
 
 
 @dataclass
@@ -271,6 +303,10 @@ class FGt(Instruction):
     rhs: Value
     @property
     def opcode(self): return "fgt"
+    @property
+    def result_type(self):
+        from .types import BoolType
+        return BoolType(type_id=-1)
 
 
 @dataclass
@@ -279,6 +315,10 @@ class FLe(Instruction):
     rhs: Value
     @property
     def opcode(self): return "fle"
+    @property
+    def result_type(self):
+        from .types import BoolType
+        return BoolType(type_id=-1)
 
 
 @dataclass
@@ -287,6 +327,10 @@ class FGe(Instruction):
     rhs: Value
     @property
     def opcode(self): return "fge"
+    @property
+    def result_type(self):
+        from .types import BoolType
+        return BoolType(type_id=-1)
 
 
 # ── Conversion ─────────────────────────────────────────────────────────────

@@ -49,7 +49,7 @@ class DecodedModule:
 # ── Decoder ──────────────────────────────────────────────────────────────────
 
 MAGIC = b"FLUX"
-HEADER_SIZE = 16
+HEADER_SIZE = 18  # 4s(4) + H(2) + H(2) + H(2) + I(4) + I(4) = 18
 FUNC_TABLE_ENTRY_SIZE = 12  # 3 × uint32
 
 
@@ -69,11 +69,10 @@ class BytecodeDecoder:
         # Decode type table
         types = self._decode_type_table(data, type_off)
 
-        # Decode function table
-        func_table_off = type_off + header["type_table_size"]
-        name_pool_off = func_table_off  # name pool follows type table
-        # Actually, name pool is between type table and function table
-        # Let's find it by scanning
+        # Compute section offsets
+        # Layout: [Header][Type Table][Name Pool][Function Table][Code]
+        func_table_off = code_off - n_funcs * FUNC_TABLE_ENTRY_SIZE
+        name_pool_off = type_off + header["type_table_size"]
 
         # Decode each function
         functions: list[DecodedFunction] = []
@@ -112,7 +111,7 @@ class BytecodeDecoder:
     def _decode_header(self, data: bytes) -> dict:
         """Parse the 16-byte header."""
         magic, version, flags, n_funcs, type_off, code_off = struct.unpack_from(
-            "<4sHHHI I", data, 0
+            "<4sHHHII", data, 0
         )
         if magic != MAGIC:
             raise ValueError(f"Invalid magic: {magic!r} (expected {MAGIC!r})")
@@ -349,13 +348,13 @@ class BytecodeDecoder:
             return DecodedInstruction(opcode=op, operands=[rs1, imm16], offset=offset), offset + 4
 
         elif fmt == "E":
-            # 5 bytes: [opcode][rd:u8][rs1:u8][rs2:u8]
-            if offset + 5 > end:
+            # 4 bytes: [opcode][rd:u8][rs1:u8][rs2:u8]
+            if offset + 4 > end:
                 raise ValueError(f"Truncated Format E instruction at {offset}")
             rd = data[offset + 1]
             rs1 = data[offset + 2]
             rs2 = data[offset + 3]
-            return DecodedInstruction(opcode=op, operands=[rd, rs1, rs2], offset=offset), offset + 5
+            return DecodedInstruction(opcode=op, operands=[rd, rs1, rs2], offset=offset), offset + 4
 
         elif fmt == "G":
             # Variable: [opcode][len:u16][data:len bytes]
@@ -377,5 +376,9 @@ class BytecodeDecoder:
     @staticmethod
     def _read_string(data: bytes, offset: int) -> str:
         """Read a null-terminated UTF-8 string from data at offset."""
-        end = data.index(0x00, offset)
+        try:
+            end = data.index(0x00, offset)
+        except ValueError:
+            # If no null terminator found, read to end
+            end = len(data)
         return data[offset:end].decode("utf-8")

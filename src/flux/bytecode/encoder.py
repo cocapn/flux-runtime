@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
 MAGIC = b"FLUX"
 VERSION = 1
-HEADER_SIZE = 16
+HEADER_SIZE = 18  # 4s(4) + H(2) + H(2) + H(2) + I(4) + I(4) = 18
 
 # Type kind tags for the type table
 TK_INT = 0x01
@@ -113,9 +113,9 @@ class BytecodeEncoder:
         func_table_off = type_off + len(type_table) + len(name_pool)
         code_off = func_table_off + len(func_entries) * 12  # 3 × u32
 
-        # ── 5. Assemble header ───────────────────────────────────────────
+        # ── 5. Assemble header (18 bytes) ───────────────────────────────
         header = struct.pack(
-            "<4sHHHI I",
+            "<4sHHHII",
             MAGIC, VERSION, 0, len(func_entries),
             type_off, code_off,
         )
@@ -242,30 +242,30 @@ class BytecodeEncoder:
         if op_name == "nop":
             return bytes([Op.NOP])
 
-        # ── Binary arithmetic (Format E: [op][rd][rs1][rs2]) ───────────
+        # ── Binary arithmetic (Format C: [op][rs1][rs2]) ─────────────
         if op_name in _BIN_ARITH:
             bc_op = _BIN_ARITH[op_name]
-            return struct.pack("<BBBB", bc_op, self._vid(instr.lhs), self._vid(instr.rhs), 0)
+            return struct.pack("<BBB", bc_op, self._vid(instr.lhs), self._vid(instr.rhs))
 
-        # ── Binary comparison (Format E: [op][rd][rs1][rs2]) ──────────
+        # ── Binary comparison (Format C: [op][rs1][rs2]) ──────────
         if op_name in _BIN_CMP:
             bc_op = _BIN_CMP[op_name]
-            return struct.pack("<BBBB", bc_op, self._vid(instr.lhs), self._vid(instr.rhs), 0)
+            return struct.pack("<BBB", bc_op, self._vid(instr.lhs), self._vid(instr.rhs))
 
         # INe → IEQ (same opcode, different semantic at runtime)
         if op_name == "ine":
-            return struct.pack("<BBBB", Op.IEQ, self._vid(instr.lhs), self._vid(instr.rhs), 0)
+            return struct.pack("<BBB", Op.IEQ, self._vid(instr.lhs), self._vid(instr.rhs))
 
-        # ── Unary (Format C: [op][rd][src]) ───────────────────────────────
+        # ── Unary (Format B: [op][src]) ───────────────────────────────────
         if op_name in _UNARY:
             bc_op = _UNARY[op_name]
-            return struct.pack("<BBB", bc_op, 0, self._vid(instr.lhs))
+            return struct.pack("<BB", bc_op, self._vid(instr.lhs))
 
-        # ── Return ───────────────────────────────────────────────────────
+        # ── Return (Format C: [op][0][value_id]) ────────────────────────
         if op_name == "return":
             if instr.value is None:
-                return bytes([Op.RET])  # Format A
-            return struct.pack("<BBB", Op.RET, 0, self._vid(instr.value))  # Format C
+                return struct.pack("<BBB", Op.RET, 0, 0)  # no return value
+            return struct.pack("<BBB", Op.RET, 0, self._vid(instr.value))
 
         # ── Unreachable → HALT (Format A) ────────────────────────────────
         if op_name == "unreachable":
@@ -277,7 +277,8 @@ class BytecodeEncoder:
 
         # ── Branch (Format D: [JZ][cond_reg][offset:16]) ─────────────────
         if op_name == "branch":
-            return struct.pack("<BBh", Op.JZ, self._vid(instr.cond), 0)
+            cond_id = self._vid(instr.cond) if instr.cond is not None else 0
+            return struct.pack("<BBh", Op.JZ, cond_id, 0)
 
         # ── Switch → encoded as Format G with case data ──────────────────
         if op_name == "switch":

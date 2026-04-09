@@ -7,7 +7,7 @@ import struct
 from .opcodes import Op, get_format, instruction_size
 
 MAGIC = b"FLUX"
-HEADER_SIZE = 16
+HEADER_SIZE = 18  # 4s(4) + H(2) + H(2) + H(2) + I(4) + I(4) = 18
 FUNC_TABLE_ENTRY_SIZE = 12
 MAX_REGISTER = 63  # 64 registers: 0-63
 
@@ -31,7 +31,7 @@ class BytecodeValidator:
         # ── 2. Parse and verify header fields ────────────────────────────
         try:
             _, version, flags, n_funcs, type_off, code_off = struct.unpack_from(
-                "<4sHHHI I", data, 0
+                "<4sHHHII", data, 0
             )
         except struct.error as e:
             errors.append(f"Failed to parse header: {e}")
@@ -53,9 +53,9 @@ class BytecodeValidator:
             return errors
 
         # ── 3. Validate function table ───────────────────────────────────
-        # Compute where function table starts: after type table + name pool
-        # We approximate: func_table starts at code_off - n_funcs * 12
+        # Layout: [Header][Type Table][Name Pool][Function Table][Code]
         func_table_off = code_off - n_funcs * FUNC_TABLE_ENTRY_SIZE
+        name_pool_off = type_off + self._scan_type_table_size(data, type_off)
 
         if func_table_off < 0:
             errors.append("Function table offset is negative (corrupted header)")
@@ -90,7 +90,7 @@ class BytecodeValidator:
 
             # Read function name
             try:
-                name_pool_abs = func_table_off + name_off
+                name_pool_abs = name_pool_off + name_off
                 if name_pool_abs >= len(data):
                     errors.append(f"Function {i}: name offset out of bounds")
                     continue
@@ -180,6 +180,8 @@ class BytecodeValidator:
                     errors.append(
                         f"{context}: register rs1={rs1} > {MAX_REGISTER} at offset {pos - start}"
                     )
+                if op == Op.RET or op == Op.HALT:
+                    has_terminator = True
                 pos += 3
 
             elif fmt == "D":
@@ -201,7 +203,7 @@ class BytecodeValidator:
                 pos += 4
 
             elif fmt == "E":
-                if pos + 5 > end:
+                if pos + 4 > end:
                     errors.append(f"{context}: truncated Format E at offset {pos - start}")
                     break
                 for reg_idx, byte_off in [(0, pos + 1), (1, pos + 2), (2, pos + 3)]:
@@ -210,7 +212,7 @@ class BytecodeValidator:
                         errors.append(
                             f"{context}: register {reg} > {MAX_REGISTER} at offset {pos - start}"
                         )
-                pos += 5
+                pos += 4
 
             elif fmt == "G":
                 if pos + 3 > end:
@@ -222,11 +224,11 @@ class BytecodeValidator:
                         f"{context}: Format G data extends past code end at offset {pos - start}"
                     )
                     break
-                # Validate register references in payload (first few bytes may be reg IDs)
+                # Validate register references in payload (first 2 bytes are reg IDs)
                 payload_start = pos + 3
                 payload_end = pos + 3 + data_len
                 p = payload_start
-                while p < min(payload_end, payload_start + 4):
+                while p < min(payload_end, payload_start + 2):
                     if data[p] > MAX_REGISTER:
                         errors.append(
                             f"{context}: register {data[p]} > {MAX_REGISTER} in payload at offset {pos - start}"
@@ -240,3 +242,75 @@ class BytecodeValidator:
         # ── 6. Check terminator ──────────────────────────────────────────
         if not has_terminator and instr_offsets:
             errors.append(f"{context}: function does not end with RET or HALT")
+
+    def _scan_type_table_size(self, data: bytes, offset: int) -> int:
+        """Scan the type table to determine its byte size."""
+        if offset + 2 > len(data):
+            return 0
+        n_types = struct.unpack_from("<H", data, offset)[0]
+        pos = offset + 2
+        for _ in range(n_types):
+            if pos >= len(data):
+                break
+            pos = self._skip_type_entry(data, pos)
+        return pos - offset
+
+    @staticmethod
+    def _skip_type_entry(data: bytes, pos: int) -> int:
+        """Skip past one type entry, return new position."""
+        if pos >= len(data):
+            return pos
+        kind = data[pos]
+        pos += 1
+
+        if kind == 0x01:  # INT
+            pos += 2
+        elif kind == 0x02:  # FLOAT
+            pos += 1
+        elif kind in (0x03, 0x04, 0x05, 0x0E, 0x0F):  # BOOL, UNIT, STRING, AGENT, TRUST
+            pass
+        elif kind == 0x06:  # REF
+            pos += 2
+        elif kind == 0x07:  # ARRAY
+            pos += 6
+        elif kind == 0x08:  # VECTOR
+            pos += 3
+        elif kind == 0x09:  # FUNC
+            if pos + 4 > len(data):
+                return pos
+            n_params, n_returns = struct.unpack_from("<HH", data, pos)
+            pos += 4 + (n_params + n_returns) * 2
+        elif kind in (0x0A, 0x0B):  # STRUCT, ENUM
+            if pos + 2 > len(data):
+                return pos
+            name_len = struct.unpack_from("<H", data, pos)[0]
+            pos += 2 + name_len
+            if pos + 2 > len(data):
+                return pos
+            n_items = struct.unpack_from("<H", data, pos)[0]
+            pos += 2
+            for _ in range(n_items):
+                if pos + 2 > len(data):
+                    return pos
+                item_name_len = struct.unpack_from("<H", data, pos)[0]
+                pos += 2 + item_name_len
+                if kind == 0x0A:
+                    pos += 2
+                else:
+                    if pos < len(data):
+                        has_type = data[pos]
+                        pos += 1
+                        if has_type:
+                            pos += 2
+        elif kind == 0x0C:  # REGION
+            if pos + 2 > len(data):
+                return pos
+            name_len = struct.unpack_from("<H", data, pos)[0]
+            pos += 2 + name_len
+        elif kind == 0x0D:  # CAPABILITY
+            for _ in range(2):
+                if pos + 2 > len(data):
+                    return pos
+                s_len = struct.unpack_from("<H", data, pos)[0]
+                pos += 2 + s_len
+        return pos

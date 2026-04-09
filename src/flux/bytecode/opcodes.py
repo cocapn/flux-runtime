@@ -153,7 +153,7 @@ class Op(IntEnum):
 
 # Format A: 1 byte — opcode only
 FORMAT_A = frozenset({
-    Op.NOP, Op.RET, Op.HALT, Op.YIELD,
+    Op.NOP, Op.HALT, Op.YIELD,
     Op.DUP, Op.SWAP, Op.DEBUG_BREAK, Op.EMERGENCY_STOP,
 })
 
@@ -161,14 +161,23 @@ FORMAT_A = frozenset({
 FORMAT_B = frozenset({
     Op.INC, Op.DEC, Op.ENTER, Op.LEAVE,
     Op.PUSH, Op.POP,
+    Op.INEG, Op.FNEG, Op.INOT,
 })
 
 # Format C: 3 bytes — opcode + rd:u8 + rs1:u8
 FORMAT_C = frozenset({
     Op.MOV, Op.LOAD, Op.STORE, Op.CMP,
-    Op.INEG, Op.FNEG, Op.INOT,
     Op.LOAD8, Op.STORE8,
     Op.ALLOCA, Op.CAST,
+    Op.RET,
+    # Binary arithmetic: [op][rs1][rs2]
+    Op.IADD, Op.ISUB, Op.IMUL, Op.IDIV, Op.IMOD, Op.IREM,
+    Op.IAND, Op.IOR, Op.IXOR, Op.ISHL, Op.ISHR,
+    Op.FADD, Op.FSUB, Op.FMUL, Op.FDIV,
+    # Comparison: [op][lhs][rhs]
+    Op.IEQ, Op.ILT, Op.ILE, Op.IGT, Op.IGE,
+    Op.FEQ, Op.FLT, Op.FLE, Op.FGT, Op.FGE,
+    Op.ICMP,
 })
 
 # Format D: 4 bytes — opcode + reg:u8 + imm16:i16 (signed offset)
@@ -180,10 +189,7 @@ FORMAT_D = frozenset({
 
 # Format E: 4 bytes — opcode + rd:u8 + rs1:u8 + rs2:u8 (ternary ops)
 FORMAT_E = frozenset({
-    Op.IADD, Op.ISUB, Op.IMUL, Op.IDIV, Op.IMOD, Op.IREM,
-    Op.IAND, Op.IOR, Op.IXOR, Op.ISHL, Op.ISHR,
-    Op.FADD, Op.FSUB, Op.FMUL, Op.FDIV,
-    Op.VFMA, Op.ICMP,
+    Op.VFMA,
 })
 
 # Format G: variable — opcode + len:u16 + data:len bytes
