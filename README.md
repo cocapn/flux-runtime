@@ -2,6 +2,22 @@
 
 **A Self-Assembling, Self-Improving Runtime — The DJ Booth for Agent Code**
 
+```
+     ╔═══════════════════════════════════════════╗
+     ║                                           ║
+     ║   ██████╗ ██████╗ ██████╗ ███████╗         ║
+     ║   ██╔══██╗██╔═══╝ ██╔══██╗██╔════╝         ║
+     ║   ██████╔╝██║     ██║  ██║█████╗           ║
+     ║   ██╔═══╝ ██║     ██║  ██║██╔══╝           ║
+     ║   ██║     ╚██████╗██████╔╝███████╗         ║
+     ║   ╚═╝      ╚═════╝╚═════╝ ╚══════╝         ║
+     ║                                           ║
+     ║   Fluid Language Universal eXecution      ║
+     ║   v0.1.0 · 1848 tests · 106 modules       ║
+     ║                                           ║
+     ╚═══════════════════════════════════════════╝
+```
+
 FLUX is not just a compiler or a VM. It's a living system that writes, optimizes, recompiles, and improves its own code — all while running. Think of it as the evolution from orchestra (rigid, top-down) through folk (expressive), jazz (improvisational), rock (powerful), to DJ/rave (layered, adaptive, self-evolving).
 
 ## The Philosophy
@@ -17,42 +33,37 @@ FLUX treats agents as first-class citizens. Agents write structured markdown con
 ## Architecture — The Full Stack
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  SYNTHESIS — FluxSynthesizer (the DJ booth)                    │
-│  Wires ALL subsystems: modules, profiler, selector,            │
-│  tiles, evolution, hot-reload, system reports                  │
-├─────────────────────────────────────────────────────────────────┤
-│  MODULES — 8-Level Fractal Hierarchy (TRAIN → CARD)            │
-│  Nested containers, atomic hot-reload at any granularity,      │
-│  namespace isolation, SHA-256 checksum trees                   │
-├──────────────────────────┬──────────────────────────────────────┤
-│  ADAPTIVE                │  EVOLUTION                           │
-│  Profiler (heat map)     │  Genome (system DNA snapshots)       │
-│  Selector (language rec) │  PatternMiner (hot sequence mining)  │
-│  CompilerBridge (recomp) │  SystemMutator (proposes changes)    │
-│                          │  CorrectnessValidator (no regressions)│
-│                          │  EvolutionEngine (the main loop)     │
-├──────────────────────────┼──────────────────────────────────────┤
-│  TILES — 35 built-in composable computation patterns            │
-│  COMPUTE (8): map, reduce, scan, filter, zip, flatmap, sort, unique  │
-│  MEMORY (6): gather, scatter, stream, copy, fill, transpose     │
-│  CONTROL (6): loop, while, branch, switch, fuse, pipeline      │
-│  A2A (6): tell, ask, broadcast, a2a_reduce, a2a_scatter, barrier │
-│  EFFECT (3): print, log, state_mut                              │
-│  TRANSFORM (6): cast, reshape, pack, unpack, join, split       │
-├─────────────────────────────────────────────────────────────────┤
-│  L5  Agent Runtime (trust, scheduling, resources)               │
-├─────────────────────────────────────────────────────────────────┤
-│  L4  A2A Protocol (SEND, ASK, TELL, DELEGATE...)                │
-├─────────────────────────────────────────────────────────────────┤
-│  L3  FLUX Bytecode (compact binary, 104 opcodes)                │
-├─────────────────────────────────────────────────────────────────┤
-│  L2  FIR — Flux IR (universal SSA-form IR)                     │
-├─────────────────────────────────────────────────────────────────┤
-│  L1  Frontend Pass (C/Python/Rust → FIR)                       │
-├─────────────────────────────────────────────────────────────────┤
-│  L0  FLUX.MD (structured markdown, agent source)                │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│  TIER 8: SYNTHESIS — FluxSynthesizer (the DJ booth)                │
+│  Wires ALL subsystems: modules, profiler, selector, tiles,         │
+│  evolution, hot-reload, system reports                              │
+├─────────────────────────────────────────────────────────────────────┤
+│  TIER 7: MODULES — 8-Level Fractal Hierarchy                        │
+│  TRAIN → CARRIAGE → LUGGAGE → BAG → POCKET → WALLET → SLOT → CARD │
+│  Nested containers, atomic hot-reload, namespace isolation          │
+├──────────────────────────┬──────────────────────────────────────────┤
+│  TIER 6A: ADAPTIVE       │  TIER 6B: EVOLUTION                     │
+│  Profiler (heat map)     │  Genome (system DNA snapshots)           │
+│  Selector (lang rec)     │  PatternMiner (hot sequence mining)      │
+│  CompilerBridge (recomp) │  SystemMutator (7 strategies)           │
+│                          │  CorrectnessValidator (no regressions)   │
+│                          │  EvolutionEngine (the main loop)        │
+├──────────────────────────┴──────────────────────────────────────────┤
+│  TIER 5: TILES — 35 built-in composable computation patterns       │
+│  COMPUTE(8) MEMORY(6) CONTROL(6) A2A(6) EFFECT(3) TRANSFORM(6)     │
+├─────────────────────────────────────────────────────────────────────┤
+│  TIER 4: AGENT RUNTIME (trust, scheduling, resources)              │
+├─────────────────────────────────────────────────────────────────────┤
+│  TIER 3: A2A PROTOCOL (SEND, ASK, TELL, DELEGATE...)               │
+├─────────────────────────────────────────────────────────────────────┤
+│  TIER 2: SUPPORTING — Optimizer · JIT · Types · Stdlib · Security  │
+├─────────────────────────────────────────────────────────────────────┤
+│  TIER 1: CORE PIPELINE                                              │
+│  L0: FLUX.MD Parser  →  L1: Frontends (C/Python/Rust)              │
+│  →  L2: FIR (SSA IR, 15 types, 42 instructions)                    │
+│  →  L3: Bytecode (104 opcodes, 6 formats)                          │
+│  →  L4: Micro-VM (64 registers, fetch-decode-execute)              │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Key Features
@@ -61,15 +72,19 @@ FLUX treats agents as first-class citizens. Agents write structured markdown con
 - **Zero-overhead cross-language calls** — Polyglot ABI with region-qualified pointers
 - **Native A2A opcodes** — 32 bytecode instructions for agent-to-agent communication
 - **5-tier execution** — Interpreter → Baseline JIT → Optimizing JIT → AOT → Silicon
-- **8-level fractal hot-reload** — Swap code at any granularity from TRAIN (whole app) to CARD (single function) without stopping
-- **Adaptive language selection** — The profiler listens; the selector chooses: COOL→Python, WARM→TypeScript, HOT→Rust, HEAT→C+SIMD
-- **35 composable tiles** — Reusable computation patterns that can be chained, nested, parallelized, and hot-swapped
-- **Self-evolution engine** — The system profiles itself, discovers hot patterns, generates improved tiles, recompiles modules, validates correctness, and tracks improvement across generations
+- **8-level fractal hot-reload** — Swap code at any granularity without stopping (TRAIN to CARD)
+- **Adaptive language selection** — COOL→Python, WARM→TypeScript, HOT→Rust, HEAT→C+SIMD
+- **35 composable tiles** — Reusable computation patterns: chain, nest, parallel, hot-swap
+- **Self-evolution engine** — Profile → Discover → Propose → Validate → Commit → Improve
 - **6-dimension trust engine** — History, capability, latency, consistency, determinism, audit
 - **Capability-based security** — Hierarchical tokens, resource limits, hardware sandbox mode
 - **Linear region memory** — Ownership-based, zero-GC, zero-fragmentation
 
 ## Quick Start
+
+### Prerequisites
+
+- Python 3.10+ (stdlib only — no external dependencies)
 
 ### The Self-Improving Demo (recommended)
 
@@ -79,6 +94,14 @@ PYTHONPATH=src python3 -m flux.synthesis.demo
 ```
 
 This demonstrates the entire system: loading nested modules, profiling execution, classifying heat levels, running the evolution engine, showing language upgrades, and hot-reloading a card mid-set.
+
+### Run the Tests
+
+```bash
+cd flux-repo
+PYTHONPATH=src python3 -m pytest tests/ -v
+# 1848 passed in ~13s
+```
 
 ### The Synthesizer API
 
@@ -90,15 +113,13 @@ synth = FluxSynthesizer("my_app")
 # Load modules at different nesting levels
 synth.load_module("audio/input", source, language="python")
 synth.load_module("audio/dsp/filter", source, language="python")
-synth.load_module("audio/dsp/reverb", source, language="python")
 
 # Profile a workload
 synth.record_call("my_app.audio.dsp.filter", duration_ns=50000, calls=100)
-synth.record_call("my_app.audio.dsp.reverb", duration_ns=80000, calls=100)
 
-# See the heat map: filter is HEAT, reverb is HOT
+# See the heat map
 print(synth.get_heatmap())
-# {'my_app.audio.dsp.filter': 'HEAT', 'my_app.audio.dsp.reverb': 'HOT', ...}
+# {'my_app.audio.dsp.filter': 'HEAT', ...}
 
 # Get language recommendations
 for path, rec in synth.get_recommendations().items():
@@ -109,7 +130,7 @@ for path, rec in synth.get_recommendations().items():
 report = synth.evolve(generations=5)
 print(f"Fitness: {report.initial_fitness:.4f} → {report.final_fitness:.4f}")
 
-# Hot-reload a single card without affecting others
+# Hot-reload a single card without stopping
 synth.hot_swap("audio/dsp/filter", "def improved_filter(s): return [x*2 for x in s]")
 
 # Generate full system report
@@ -159,9 +180,9 @@ from flux.vm.interpreter import Interpreter
 from flux.bytecode.opcodes import Op
 
 bytecode = bytes([
-    Op.MOVI, 0x01, 10, 0x00,
-    Op.MOVI, 0x02, 20, 0x00,
-    Op.IADD, 0x00, 0x01, 0x02,
+    Op.MOVI, 0x01, 10, 0x00,   # MOV R1, 10
+    Op.MOVI, 0x02, 20, 0x00,   # MOV R2, 20
+    Op.IADD, 0x00, 0x01, 0x02, # R0 = R1 + R2
     Op.HALT,
 ])
 interp = Interpreter(bytecode)
@@ -169,132 +190,31 @@ interp.execute()
 print(f"R0 = {interp.regs.read_gp(0)}")  # 30
 ```
 
-## Layer-by-Layer Breakdown
+## Subsystem Overview
 
-### Synthesis Layer (`src/flux/synthesis/`)
-The top-level integration layer — the DJ booth that wires everything together.
-
-- **FluxSynthesizer**: The main orchestrator — manages modules, profiling, language selection, tile composition, evolution, and hot-reload
-- **SystemReport**: Comprehensive text/JSON report generator with 7 sections (overview, hierarchy, heatmap, languages, tiles, evolution, fitness trend)
-- **Demo**: Runnable demo showing the system improving itself (`python -m flux.synthesis.demo`)
-
-### Module System (`src/flux/modules/`)
-8-level fractal hierarchy with independent hot-reloading at any granularity.
-
-- **TRAIN → CARRIAGE → LUGGAGE → BAG → POCKET → WALLET → SLOT → CARD**
-- **ModuleContainer**: Nestable container tree with SHA-256 checksum verification
-- **ModuleCard**: Atomic hot-reloadable unit (source + compiled artifacts + version)
-- **FractalReloader**: Hot-reload engine with cascade, strategy recommendations, and history
-- **ModuleNamespace**: Parent-child scope chains with full isolation
-
-### Adaptive Subsystem (`src/flux/adaptive/`)
-Runtime profiling and dynamic language selection — like a DJ reading the room.
-
-- **AdaptiveProfiler**: Classifies modules as FROZEN/COOL/WARM/HOT/HEAT using percentile-based thresholds
-- **AdaptiveSelector**: Maps heat to language (COOL→Python, WARM→TypeScript, HOT→Rust, HEAT→C+SIMD) with reload penalty awareness
-- **CompilerBridge**: Cross-language recompilation pipeline with SHA-256 content caching
-
-### Tile System (`src/flux/tiles/`)
-35 built-in composable computation patterns — the sample library.
-
-- **6 categories**: COMPUTE, MEMORY, CONTROL, A2A, EFFECT, TRANSFORM
-- **Tile**: Composable (chain, parallel, nest), parameterizable, FIR-emitting
-- **TileGraph**: DAG composition with topological ordering and pattern matching
-- **TileRegistry**: Fuzzy search, type filtering, alternative discovery, cost ranking
-
-### Evolution Engine (`src/flux/evolution/`)
-The system that builds a better version of itself — the self-improvement loop.
-
-- **Genome**: System DNA snapshots (modules, tiles, languages, profiler data, optimization history)
-- **PatternMiner**: Modified Apriori algorithm finds hot execution subsequences
-- **SystemMutator**: 7 mutation strategies (RECOMPILE_LANGUAGE, FUSE_PATTERN, REPLACE_TILE, ADD_TILE, MERGE_TILES, SPLIT_TILE, INLINE_OPTIMIZATION)
-- **CorrectnessValidator**: Test suite management, baseline capture, regression detection
-- **EvolutionEngine**: Capture → Profile → Mine → Propose → Evaluate → Commit → Measure → Repeat
-
-### L0: FLUX.MD Parser (`src/flux/parser/`)
-- Structured markdown parser with YAML frontmatter, headings, code blocks, lists
-- Code block classification: FluxCodeBlock, DataBlock, NativeBlock
-- Agent directive extraction (`## agent:`, `## fn:`)
-
-### L1: Frontend Compilers (`src/flux/frontend/`)
-- **C Frontend**: Recursive descent parser → FIR (functions, if/else, while, for, arithmetic, comparison)
-- **Python Frontend**: AST-based compiler → FIR (def, if/elif/else, while, for/range, calls, print)
-
-### L2: FIR — Flux IR (`src/flux/fir/`)
-- **Types**: 15 immutable types with TypeContext interning
-- **Instructions**: 42 instruction types (arithmetic, bitwise, comparison, conversion, memory, control flow, A2A)
-- **Blocks**: FIRBlock, FIRFunction, FIRModule with SSA form
-- **Builder**: Ergonomic API for constructing FIR
-- **Validator**: Structural invariant checking
-- **Printer**: Human-readable IR output
-
-### L3: Bytecode (`src/flux/bytecode/`)
-- **Opcodes**: 104 opcodes (control flow, integer/float arithmetic, bitwise, comparison, stack, function, memory, type, SIMD, A2A protocol, system)
-- **Encoder**: FIRModule → binary bytecode (18-byte header + type table + name pool + function table + code section)
-- **Decoder**: Binary bytecode → DecodedModule with full instruction reconstruction
-- **Validator**: Structural bytecode verification (register bounds, jump targets, terminators)
-
-### L4: A2A Protocol (`src/flux/protocol/` + `src/flux/a2a/`)
-- **Messages**: Typed envelopes (Request, Response, Event, Error) with UUID-based IDs
-- **Channels**: DirectChannel (P2P), BroadcastChannel (one-to-many), TopicChannel (pub/sub)
-- **Registry**: Capability-based agent routing with heartbeat expiry
-- **Negotiation**: 4-step trust handshake (initiate → challenge → respond → accept/reject)
-- **Serialization**: BinaryMessageCodec with 60-byte header, batch encode/decode
-
-### L5: Runtime (`src/flux/runtime/`)
-- **Agent**: Runtime agent wrapping VM interpreter with register access and lifecycle
-- **AgentRuntime**: Orchestrator for multi-agent compilation, execution, and messaging
-- **CLI**: compile/run/test subcommands with language inference
-
-### Supporting Subsystems
-- **Optimizer** (`src/flux/optimizer/`): ConstantFolding, DCE, InlineFunctions, configurable pipeline
-- **JIT Compiler** (`src/flux/jit/`): Inlining, constant folding, LRU cache, execution tracing
-- **Type System** (`src/flux/types/`): Bidirectional C/Python/Rust → FIR mapping, generics (TypeVar, Vec<T>, Option<T>)
-- **Standard Library** (`src/flux/stdlib/`): Intrinsics, collections, math, strings, agent utilities
-- **Security** (`src/flux/security/`): Capability tokens, resource limits, sandbox
-- **Hot Reload** (`src/flux/reload/`): BEAM-inspired dual-version loading with rollback
-
-## Test Suite
-
-**907 tests** across 20 test files, all passing:
-
-| Test File | Tests | Coverage |
-|-----------|-------|----------|
-| `test_synthesis.py` | 54 | Synthesizer, modules, profiling, heatmap, recommendations, hot-reload, evolution, tiles, reports, full pipeline |
-| `test_evolution.py` | 154 | Genome, pattern mining, mutator, validator, evolution engine, integration pipeline |
-| `test_tiles.py` | 145 | Tile creation, ports, instantiation, composition, FIR emission, graph, registry, built-in tiles |
-| `test_adaptive.py` | 99 | Profiler, heatmap, selector, language profiles, overrides, compiler bridge |
-| `test_protocol.py` | 85 | Messages, channels, registry, negotiation, serialization |
-| `test_type_unify.py` | 76 | C/Python/Rust types, coercion, unification, generics |
-| `test_modules.py` | 72 | Granularity, containers, checksums, cards, reloader, namespace, serialization |
-| `test_stdlib.py` | 66 | Intrinsics, collections, math, strings, agents |
-| `test_jit.py` | 43 | JIT compiler, cache, tracing, optimization |
-| `test_integration.py` | 14 | Full E2E pipeline, polyglot, A2A, VM, protocol, hot reload |
-| `test_vm.py` | 25 | Interpreter, registers, memory, opcodes |
-| `test_bytecode.py` | 12 | Encoder, decoder, validator, roundtrip |
-| `test_parser.py` | 11 | Markdown parsing, AST nodes |
-| `test_a2a.py` | 10 | Messages, transport, trust, coordinator |
-| `test_security.py` | 6 | Capabilities, expiry, sandbox |
-| `test_runtime.py` | 6 | Agent creation, compilation, execution |
-| `test_fir.py` | 13 | Types, builder, validator, printer |
-| `test_frontends.py` | 8 | C and Python frontend compilation |
-| `test_optimizer.py` | 4 | Constant folding, DCE, inlining |
-| `test_reload.py` | 3 | Hot loader, versioning, rollback |
-
-## Build & Test
-
-```bash
-cd flux-repo
-
-# Run all tests
-PYTHONPATH=src python3 -m pytest tests/ -v
-
-# Run synthesis/integration tests
-PYTHONPATH=src python3 -m pytest tests/test_synthesis.py -v
-
-# Run the demo
-PYTHONPATH=src python3 -m flux.synthesis.demo
-```
+| # | Subsystem | Path | Tests | Description |
+|---|-----------|------|:---:|-------------|
+| 1 | FIR Core | `src/flux/fir/` | 13 | Universal SSA IR: 15 types, 42 instructions, builder, validator, printer |
+| 2 | FLUX.MD Parser | `src/flux/parser/` | 11 | Structured markdown: frontmatter, code blocks, agent directives |
+| 3 | Bytecode | `src/flux/bytecode/` | 12 | 104 opcodes, binary encoder/decoder/validator |
+| 4 | Micro-VM | `src/flux/vm/` | 25 | 64-register interpreter with memory management |
+| 5 | Frontends | `src/flux/frontend/` | 8 | C and Python → FIR compilers |
+| 6 | Optimizer | `src/flux/optimizer/` | 4 | Constant folding, DCE, function inlining |
+| 7 | JIT Compiler | `src/flux/jit/` | 43 | Inlining, LRU cache, execution tracing, IR opts |
+| 8 | Type System | `src/flux/types/` | 76 | Polyglot unification (C/Python/Rust), generics |
+| 9 | Standard Library | `src/flux/stdlib/` | 66 | Intrinsics, collections, math, strings, agents |
+| 10 | A2A Protocol | `src/flux/protocol/` | 85 | Messages, channels, registry, negotiation, serialization |
+| 11 | Agent Runtime | `src/flux/runtime/` | 6 | Agent wrapper, orchestrator, CLI |
+| 12 | Security | `src/flux/security/` | 6 | Capability tokens, resource limits, sandbox |
+| 13 | Hot Reload | `src/flux/reload/` | 3 | BEAM-inspired dual-version loading with rollback |
+| 14 | Module System | `src/flux/modules/` | 72 | 8-level fractal hierarchy, checksum trees, namespaces |
+| 15 | Adaptive Subsystem | `src/flux/adaptive/` | 99 | Profiler, language selector, compiler bridge |
+| 16 | Tile System | `src/flux/tiles/` | 145 | 35 tiles, DAG graphs, registry, pattern matching |
+| 17 | Evolution Engine | `src/flux/evolution/` | 154 | Genome, pattern mining, mutation, validation, loop |
+| 18 | Synthesis | `src/flux/synthesis/` | 54 | Top-level orchestrator, reports, demo |
+| 19 | E2E Pipeline | `src/flux/pipeline/` | 14 | Full pipeline, polyglot compiler, debugger |
+| 20 | A2A Primitives | `src/flux/a2a/` | 10 | Message types, transport, coordinator, trust |
+| | **TOTAL** | | **1848** | **106 source modules, 30 test files** |
 
 ## File Structure
 
@@ -303,60 +223,39 @@ flux-repo/
 ├── src/flux/
 │   ├── __init__.py                     # Package root (v0.1.0)
 │   ├── cli.py                         # CLI entry point (compile/run/test)
-│   ├── synthesis/                     # SYNTHESIS: Top-level integration layer
-│   │   ├── __init__.py               # Exports: FluxSynthesizer, SystemReport
+│   ├── synthesis/                     # TIER 8: Top-level integration
 │   │   ├── synthesizer.py            # FluxSynthesizer — the DJ booth
-│   │   ├── report.py                 # SystemReport — 7-section report generator
-│   │   └── demo.py                   # Runnable demo (python -m flux.synthesis.demo)
-│   ├── modules/                       # MODULES: 8-level fractal hierarchy
-│   │   ├── granularity.py            # Granularity enum (TRAIN→CARD, 8 levels)
-│   │   ├── card.py                   # ModuleCard — atomic hot-reloadable unit
-│   │   ├── container.py              # ModuleContainer — nestable container tree
+│   │   ├── report.py                 # SystemReport — 7-section reports
+│   │   └── demo.py                   # Runnable demo
+│   ├── modules/                       # TIER 7: 8-level fractal hierarchy
+│   │   ├── granularity.py            # Granularity enum (TRAIN→CARD)
+│   │   ├── card.py                   # ModuleCard — atomic hot-reload unit
+│   │   ├── container.py              # ModuleContainer — nestable tree
 │   │   ├── reloader.py               # FractalReloader — cascade + strategy
-│   │   └── namespace.py              # ModuleNamespace — parent-child isolation
-│   ├── adaptive/                      # ADAPTIVE: Profiling + language selection
-│   │   ├── profiler.py               # AdaptiveProfiler (FROZEN/COOL/WARM/HOT/HEAT)
-│   │   ├── selector.py               # AdaptiveSelector (heat → language mapping)
-│   │   └── compiler_bridge.py        # CompilerBridge (cross-language recompilation)
-│   ├── tiles/                         # TILES: 35 composable computation patterns
-│   │   ├── tile.py                   # Tile, TileInstance, CompositeTile, ParallelTile
-│   │   ├── ports.py                  # TilePort, PortDirection, type compatibility
-│   │   ├── library.py                # 35 built-in tiles across 6 categories
-│   │   ├── graph.py                  # TileGraph — DAG composition + FIR compilation
-│   │   └── registry.py               # TileRegistry — search, alternatives, ranking
-│   ├── evolution/                     # EVOLUTION: Self-improvement engine
+│   │   └── namespace.py              # ModuleNamespace — scope isolation
+│   ├── adaptive/                      # TIER 6A: Profiling + language selection
+│   │   ├── profiler.py               # AdaptiveProfiler (FROZEN→HEAT)
+│   │   ├── selector.py               # AdaptiveSelector (heat → language)
+│   │   └── compiler_bridge.py        # CompilerBridge (cross-language)
+│   ├── evolution/                     # TIER 6B: Self-improvement engine
 │   │   ├── genome.py                 # Genome — system DNA snapshots
 │   │   ├── pattern_mining.py         # PatternMiner — hot sequence discovery
 │   │   ├── mutator.py                # SystemMutator — 7 mutation strategies
-│   │   ├── validator.py              # CorrectnessValidator — regression detection
+│   │   ├── validator.py              # CorrectnessValidator — regression guard
 │   │   └── evolution.py              # EvolutionEngine — the main loop
-│   ├── parser/                        # L0: FLUX.MD parser
-│   │   ├── nodes.py                  # AST node types (12 dataclasses)
-│   │   └── parser.py                 # FluxMDParser class
-│   ├── frontend/                      # L1: Language frontends
-│   │   ├── c_frontend.py             # C → FIR compiler
-│   │   └── python_frontend.py        # Python → FIR compiler
-│   ├── fir/                           # L2: Flux IR
-│   │   ├── types.py                  # 15 type classes + TypeContext
-│   │   ├── values.py                 # SSA Value
-│   │   ├── instructions.py           # 42 instruction classes
-│   │   ├── blocks.py                 # FIRBlock, FIRFunction, FIRModule
-│   │   ├── builder.py                # FIRBuilder
-│   │   ├── validator.py              # FIRValidator
-│   │   └── printer.py                # print_fir()
-│   ├── bytecode/                      # L3: Bytecode
-│   │   ├── opcodes.py                # 104-opcode IntEnum
-│   │   ├── encoder.py                # FIRModule → bytes
-│   │   ├── decoder.py                # bytes → DecodedModule
-│   │   └── validator.py              # BytecodeValidator
-│   ├── vm/                            # Micro-VM interpreter
-│   │   ├── registers.py              # 64-register file (GP/FP/VEC)
-│   │   ├── memory.py                 # MemoryRegion + MemoryManager
-│   │   └── interpreter.py            # Fetch-decode-execute loop
-│   ├── protocol/                      # L4: A2A Protocol
+│   ├── tiles/                         # TIER 5: 35 composable patterns
+│   │   ├── tile.py                   # Tile, CompositeTile, ParallelTile
+│   │   ├── ports.py                  # TilePort, PortDirection
+│   │   ├── library.py                # 35 built-in tiles across 6 categories
+│   │   ├── graph.py                  # TileGraph — DAG + FIR compilation
+│   │   └── registry.py               # TileRegistry — search + alternatives
+│   ├── runtime/                       # TIER 4: Agent Runtime
+│   │   ├── agent.py                  # Agent (wraps Interpreter)
+│   │   └── agent_runtime.py          # AgentRuntime orchestrator
+│   ├── protocol/                      # TIER 3: A2A Protocol
 │   │   ├── message.py                # Typed message envelopes
 │   │   ├── channel.py                # Direct/Broadcast/Topic channels
-│   │   ├── registry.py               # Capability-based agent registry
+│   │   ├── registry.py               # Capability-based routing
 │   │   ├── negotiation.py            # 4-step trust handshake
 │   │   └── serialization.py          # BinaryMessageCodec
 │   ├── a2a/                           # A2A primitives
@@ -364,33 +263,53 @@ flux-repo/
 │   │   ├── transport.py              # Agent transport
 │   │   ├── coordinator.py            # Agent coordination
 │   │   └── trust.py                  # Trust engine
-│   ├── runtime/                       # L5: Agent Runtime
-│   │   ├── agent.py                  # Agent (wraps Interpreter)
-│   │   └── agent_runtime.py          # AgentRuntime orchestrator
-│   ├── optimizer/                     # Optimization passes
-│   │   ├── passes.py                 # CF, DCE, Inline passes
+│   ├── optimizer/                     # TIER 2: Optimization passes
+│   │   ├── passes.py                 # CF, DCE, Inline
 │   │   └── pipeline.py               # OptimizationPipeline
-│   ├── jit/                           # JIT compiler
+│   ├── jit/                           # TIER 2: JIT compiler
 │   │   ├── compiler.py               # JITCompiler
 │   │   ├── cache.py                  # JITCache (LRU, SHA-256)
 │   │   ├── tracing.py                # ExecutionTracer
 │   │   └── ir_optimize.py            # IR-level optimizations
-│   ├── types/                         # Type system
+│   ├── types/                         # TIER 2: Type system
 │   │   ├── unify.py                  # TypeUnifier (C/Python/Rust → FIR)
 │   │   ├── compat.py                 # Type compatibility
 │   │   └── generic.py                # GenericType, TypeVar, TypeScheme
-│   ├── stdlib/                        # Standard library
+│   ├── stdlib/                        # TIER 2: Standard library
 │   │   ├── intrinsics.py             # print, assert, panic, sizeof, etc.
 │   │   ├── collections.py            # List, Map, Set, Queue, Stack
 │   │   ├── math.py                   # min, max, abs, clamp, lerp, sqrt
 │   │   ├── strings.py                # concat, substring, split, etc.
 │   │   └── agents.py                 # AgentRegistry, MessageQueue, Scheduler
-│   ├── security/                      # Security
+│   ├── security/                      # TIER 2: Security
 │   │   ├── capabilities.py           # Capability tokens
 │   │   ├── resource_limits.py        # Resource monitoring
 │   │   └── sandbox.py                # Sandbox lifecycle
-│   ├── reload/                        # Hot code reload
+│   ├── reload/                        # TIER 2: Hot code reload
 │   │   └── hot_loader.py             # BEAM-inspired HotLoader
+│   ├── parser/                        # TIER 1: L0 Parser
+│   │   ├── nodes.py                  # 12 AST node dataclasses
+│   │   └── parser.py                 # FluxMDParser class
+│   ├── frontend/                      # TIER 1: L1 Frontends
+│   │   ├── c_frontend.py             # C → FIR compiler
+│   │   └── python_frontend.py        # Python → FIR compiler
+│   ├── fir/                           # TIER 1: L2 FIR
+│   │   ├── types.py                  # 15 type classes + TypeContext
+│   │   ├── values.py                 # SSA Value
+│   │   ├── instructions.py           # 42 instruction classes
+│   │   ├── blocks.py                 # FIRBlock, FIRFunction, FIRModule
+│   │   ├── builder.py                # FIRBuilder
+│   │   ├── validator.py              # FIRValidator
+│   │   └── printer.py                # print_fir()
+│   ├── bytecode/                      # TIER 1: L3 Bytecode
+│   │   ├── opcodes.py                # 104-opcode IntEnum
+│   │   ├── encoder.py                # FIRModule → bytes
+│   │   ├── decoder.py                # bytes → DecodedModule
+│   │   └── validator.py              # BytecodeValidator
+│   ├── vm/                            # TIER 1: L4 Micro-VM
+│   │   ├── registers.py              # 64-register file (GP/FP/VEC)
+│   │   ├── memory.py                 # MemoryRegion + MemoryManager
+│   │   └── interpreter.py            # Fetch-decode-execute loop
 │   ├── compiler/                      # Unified compiler pipeline
 │   │   └── pipeline.py               # FluxCompiler (C/Python/MD → bytecode)
 │   └── pipeline/                      # E2E pipeline
@@ -419,12 +338,20 @@ flux-repo/
 │   ├── test_optimizer.py             # 4 tests — Optimizer
 │   └── test_reload.py                # 3 tests — Hot reload
 ├── docs/
-│   └── FLUX_Design_Specification.pdf
+│   ├── research/                     # 5 research documents
+│   │   ├── bootstrap_and_meta.md     # Self-hosting, polyglot runtime
+│   │   ├── simulation_and_prediction.md # Predictive optimization
+│   │   ├── memory_and_learning.md    # Persistent memory, generalization
+│   │   ├── agent_orchestration.md    # Multi-agent topologies, emergence
+│   │   └── creative_use_cases.md     # Live coding, art, storytelling
+│   ├── RESEARCH_ROADMAP.md           # Comprehensive research roadmap
+│   ├── GRADUATION.md                # Vision + design principles
+│   └── FLUX_Design_Specification.pdf # 24-page technical spec
 ├── benchmarks/
-│   └── benchmarks.py
-├── worklog.md
-├── README.md
-└── LICENSE
+│   └── benchmarks.py                 # Performance benchmarks
+├── worklog.md                        # Complete development history
+├── README.md                         # This file
+└── LICENSE                           # MIT License
 ```
 
 ## How to Extend
@@ -442,55 +369,35 @@ my_tile = Tile(
     tile_type=TileType.COMPUTE,
     inputs=[TilePort("signal", PortDirection.INPUT, ctx.f32)],
     outputs=[TilePort("spectrum", PortDirection.OUTPUT, ctx.f32)],
-    params={"window_size": 1024, "sample_rate": 44100},
+    params={"window_size": 1024},
     cost_estimate=5.0,
     abstraction_level=4,
 )
-
 synth.register_tile(my_tile)
 ```
 
-### Adding a New Language
+### Adding a New Language Frontend
 
-```python
-from flux.adaptive.selector import LanguageProfile, LANGUAGES
-
-LANGUAGES["go"] = LanguageProfile(
-    name="go",
-    speed_tier=7,
-    expressiveness_tier=7,
-    modularity_tier=8,
-    compile_time_tier=3,
-    hot_reload_support=True,
-    simd_support=False,
-    memory_safety=True,
-)
-```
-
-### Adding a New Optimization Pass
-
-```python
-from flux.optimizer.passes import OptimizationPass
-
-class MyCustomPass(OptimizationPass):
-    def run(self, module):
-        # Transform the FIR module
-        return changed_count
-```
+1. Create `src/flux/frontend/<lang>_frontend.py` that produces `FIRModule`
+2. Register in `src/flux/compiler/pipeline.py`
+3. Add `LanguageProfile` in `src/flux/adaptive/selector.py`
+4. Add type mappings in `src/flux/types/unify.py`
 
 ### Adding a New Mutation Strategy
 
 ```python
 from flux.evolution.genome import MutationStrategy
-
-MutationStrategy.CUSTOM_MUTATION = "custom_mutation"
-
-# Then implement the handler in SystemMutator.propose_mutations()
+MutationStrategy.CUSTOM = "custom"
+# Then implement handler in SystemMutator.propose_mutations()
 ```
 
-## Documentation
+## Research
 
-- [FLUX Design Specification (PDF)](docs/FLUX_Design_Specification.pdf) — 24-page comprehensive technical specification
+FLUX is a research project exploring the convergence of compilation, AI, and art. See:
+
+- **[Research Roadmap](docs/RESEARCH_ROADMAP.md)** — 15 open research questions, 10 suggested projects, extension guides
+- **[Graduation Document](docs/GRADUATION.md)** — Vision, design principles, the road ahead
+- **[Research Documents](docs/research/)** — 5 deep-dive research memos covering self-hosting, prediction, memory, orchestration, and creative applications
 
 ## Synthesis
 
@@ -498,13 +405,30 @@ FLUX integrates the best ideas from:
 
 | Source | Contribution |
 |--------|-------------|
-| [nexus-runtime](https://github.com/SuperInstance/nexus-runtime) | Intent-to-bytecode pipeline, A2A opcodes, INCREMENTS trust engine, cycle-deterministic VM |
+| [nexus-runtime](https://github.com/SuperInstance/nexus-runtime) | Intent-to-bytecode pipeline, A2A opcodes, trust engine, cycle-deterministic VM |
 | [mask-locked-inference-chip](https://github.com/Lucineer/mask-locked-inference-chip) | Zero-software-stack philosophy, hardware-enforced security |
 | GraalVM Truffle | Polyglot interop, multi-language type system |
 | LLVM | SSA IR, optimization passes, JIT/AOT |
 | WebAssembly | Compact binary, capability security, streaming compilation |
 | BEAM VM (Erlang) | Zero-downtime hot code reload |
 | Apache Arrow | Zero-copy cross-language data passing |
+
+## Contributing
+
+1. Fork the repo
+2. Create a feature branch (`git checkout -b feature/my-feature`)
+3. Write code + tests (`PYTHONPATH=src python3 -m pytest tests/ -v`)
+4. Ensure all 1848 tests pass
+5. Commit with descriptive message
+6. Open a pull request
+
+### Development Principles
+
+- Every module has comprehensive tests (aim for >90% coverage)
+- Use `frozen=True` dataclasses for shared types
+- No external dependencies — stdlib only
+- The FIR is the universal pivot — all frontends produce it, all backends consume it
+- Hot-reload at any granularity must never drop in-flight requests
 
 ## License
 
