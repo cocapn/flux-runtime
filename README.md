@@ -103,6 +103,14 @@ pip install flux-runtime
 
 > **Zero external dependencies** — FLUX runs on Python 3.10+ stdlib alone. The `[dev]` extras add testing/linting tools.
 
+### 🚀 Hello World (start here)
+
+```bash
+PYTHONPATH=src python3 examples/01_hello_world.py
+```
+
+Three approaches to run FLUX: raw bytecode, FIR builder, and the full C→bytecode pipeline. Produces beautiful terminal output.
+
 ### The Self-Improving Demo (recommended)
 
 ```bash
@@ -111,6 +119,33 @@ flux demo
 ```
 
 This demonstrates the entire system: loading nested modules, profiling execution, classifying heat levels, running the evolution engine, showing language upgrades, and hot-reloading a card mid-set.
+
+### All Examples
+
+```bash
+PYTHONPATH=src python3 examples/01_hello_world.py    # 3 ways to run FLUX
+PYTHONPATH=src python3 examples/02_polyglot.py        # Mix C + Python in one file
+PYTHONPATH=src python3 examples/03_a2a_agents.py      # Agent-to-agent communication
+PYTHONPATH=src python3 examples/04_adaptive_profiling.py  # Heat maps & language selection
+PYTHONPATH=src python3 examples/05_tile_composition.py    # Composable computation patterns
+PYTHONPATH=src python3 examples/06_evolution.py        # Self-improvement engine
+PYTHONPATH=src python3 examples/07_full_synthesis.py   # The grand tour — everything wired together
+```
+
+### Migrate Your Existing Project
+
+```bash
+# Analyze a Python file — see functions, complexity, tile recommendations
+PYTHONPATH=src python3 tools/flux_analyze.py my_project/main.py
+
+# Generate FLUX.MD wrappers for an entire project
+PYTHONPATH=src python3 tools/flux_migrate.py my_project/ --output flux_output/
+
+# Dry-run to see the migration plan without writing files
+PYTHONPATH=src python3 tools/flux_migrate.py my_project/ --dry-run
+```
+
+See [Migration Guide](docs/MIGRATION_GUIDE.md) and [Reverse Engineering](docs/REVERSE_ENGINEERING.md) for details.
 
 ### Run the Tests
 
