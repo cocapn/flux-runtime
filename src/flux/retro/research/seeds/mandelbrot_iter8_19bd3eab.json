@@ -1,0 +1,10 @@
+{
+  "seed_id": "mandelbrot_iter8_19bd3eab",
+  "value": 8038703591516265551,
+  "created_at": "2026-04-10T04:22:44.670236+00:00",
+  "flux_version": "0.1.0",
+  "python_version": "3.12.13",
+  "os_info": "Linux-x86_64",
+  "config": {},
+  "notes": "Iteration 8: Use register allocation more efficiently (fewer PUSH/POP)"
+}

@@ -1,0 +1,10 @@
+{
+  "seed_id": "lunar_lander_iter22_c8a6a48d",
+  "value": 2200261482429505718,
+  "created_at": "2026-04-10T04:22:44.710158+00:00",
+  "flux_version": "0.1.0",
+  "python_version": "3.12.13",
+  "os_info": "Linux-x86_64",
+  "config": {},
+  "notes": "Iteration 22: Run final benchmarks with statistical rigor (5 runs, mean+std)"
+}

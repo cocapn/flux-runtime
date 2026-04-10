@@ -1,0 +1,10 @@
+{
+  "seed_id": "tic_tac_toe_iter20_b230d365",
+  "value": 572267854085635627,
+  "created_at": "2026-04-10T04:22:44.722356+00:00",
+  "flux_version": "0.1.0",
+  "python_version": "3.12.13",
+  "os_info": "Linux-x86_64",
+  "config": {},
+  "notes": "Iteration 20: Build a cross-game opcode usage heatmap"
+}

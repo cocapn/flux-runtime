@@ -1,0 +1,10 @@
+{
+  "seed_id": "text_adventure_iter15_7bee5712",
+  "value": 12967275624457716015,
+  "created_at": "2026-04-10T04:22:44.664117+00:00",
+  "flux_version": "0.1.0",
+  "python_version": "3.12.13",
+  "os_info": "Linux-x86_64",
+  "config": {},
+  "notes": "Iteration 15: Measure hybrid vs pure-bytecode tradeoffs"
+}

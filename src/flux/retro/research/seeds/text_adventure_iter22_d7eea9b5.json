@@ -1,0 +1,10 @@
+{
+  "seed_id": "text_adventure_iter22_d7eea9b5",
+  "value": 1975907205874068512,
+  "created_at": "2026-04-10T04:22:44.666083+00:00",
+  "flux_version": "0.1.0",
+  "python_version": "3.12.13",
+  "os_info": "Linux-x86_64",
+  "config": {},
+  "notes": "Iteration 22: Run final benchmarks with statistical rigor (5 runs, mean+std)"
+}

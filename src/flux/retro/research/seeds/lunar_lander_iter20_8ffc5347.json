@@ -1,0 +1,10 @@
+{
+  "seed_id": "lunar_lander_iter20_8ffc5347",
+  "value": 3446105872125645392,
+  "created_at": "2026-04-10T04:22:44.707827+00:00",
+  "flux_version": "0.1.0",
+  "python_version": "3.12.13",
+  "os_info": "Linux-x86_64",
+  "config": {},
+  "notes": "Iteration 20: Build a cross-game opcode usage heatmap"
+}

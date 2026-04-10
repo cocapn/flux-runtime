@@ -1,0 +1,10 @@
+{
+  "seed_id": "mandelbrot_iter13_f490a10a",
+  "value": 18008426741239241391,
+  "created_at": "2026-04-10T04:22:44.671835+00:00",
+  "flux_version": "0.1.0",
+  "python_version": "3.12.13",
+  "os_info": "Linux-x86_64",
+  "config": {},
+  "notes": "Iteration 13: Increase simulation fidelity: more frames/steps/generations"
+}

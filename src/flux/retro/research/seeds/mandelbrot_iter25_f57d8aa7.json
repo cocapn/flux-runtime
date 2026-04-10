@@ -1,0 +1,10 @@
+{
+  "seed_id": "mandelbrot_iter25_f57d8aa7",
+  "value": 12606033648595272707,
+  "created_at": "2026-04-10T04:22:44.674583+00:00",
+  "flux_version": "0.1.0",
+  "python_version": "3.12.13",
+  "os_info": "Linux-x86_64",
+  "config": {},
+  "notes": "Iteration 25: Final review: verify all games work, compile showcase report"
+}

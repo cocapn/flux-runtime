@@ -1,0 +1,10 @@
+{
+  "seed_id": "markov_text_iter15_0ca8dadf",
+  "value": 3519045396037015622,
+  "created_at": "2026-04-10T04:22:44.729756+00:00",
+  "flux_version": "0.1.0",
+  "python_version": "3.12.13",
+  "os_info": "Linux-x86_64",
+  "config": {},
+  "notes": "Iteration 15: Measure hybrid vs pure-bytecode tradeoffs"
+}
