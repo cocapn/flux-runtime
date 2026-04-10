@@ -1,0 +1,49 @@
+---
+pattern: "load $val into R$reg"
+expand: |
+    MOVI R${reg}, ${val}
+    HALT
+result: R0
+name: load-register
+description: Load a value into a register
+tags: core, register, load
+---
+pattern: "what is $a + $b"
+expand: |
+    MOVI R0, ${a}
+    MOVI R1, ${b}
+    IADD R0, R0, R1
+    HALT
+result: R0
+name: what-is-add
+description: Natural language addition
+tags: core, math, natural-language
+---
+pattern: "what is $a * $b"
+expand: |
+    MOVI R0, ${a}
+    MOVI R1, ${b}
+    IMUL R0, R0, R1
+    HALT
+result: R0
+name: what-is-mul
+description: Natural language multiplication
+tags: core, math, natural-language
+---
+pattern: "noop"
+expand: |
+    NOP
+    HALT
+result: R0
+name: noop
+description: Do nothing
+tags: core, test
+---
+pattern: "hello"
+expand: |
+    MOVI R0, 42
+    HALT
+result: R0
+name: hello
+description: Classic hello — returns 42
+tags: core, test

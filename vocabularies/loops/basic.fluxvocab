@@ -1,0 +1,37 @@
+---
+pattern: "count from $a to $b"
+expand: |
+    MOVI R0, ${a}
+    MOVI R1, ${b}
+    INC R0
+    CMP R0, R1
+    JNZ R0, -5
+    HALT
+result: R0
+name: count-loop
+description: Count from a to b
+tags: loop, counting
+---
+pattern: "repeat $n times"
+expand: |
+    MOVI R0, ${n}
+    DEC R0
+    JNZ R0, -3
+    HALT
+result: R0
+name: repeat-n
+description: Repeat n times (decrementing counter)
+tags: loop, repeat
+---
+pattern: "multiply $a by itself $n times"
+expand: |
+    MOVI R0, ${a}
+    MOVI R1, ${n}
+    IMUL R0, R0, R0
+    DEC R1
+    JNZ R1, -4
+    HALT
+result: R0
+name: repeated-squaring
+description: Repeatedly square a number n times
+tags: loop, math, power

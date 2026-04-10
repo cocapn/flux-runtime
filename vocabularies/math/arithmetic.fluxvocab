@@ -1,0 +1,75 @@
+---
+pattern: "compute $a + $b"
+expand: |
+    MOVI R0, ${a}
+    MOVI R1, ${b}
+    IADD R0, R0, R1
+    HALT
+result: R0
+name: addition
+description: Add two numbers
+tags: math, arithmetic
+---
+pattern: "compute $a - $b"
+expand: |
+    MOVI R0, ${a}
+    MOVI R1, ${b}
+    ISUB R0, R0, R1
+    HALT
+result: R0
+name: subtraction
+description: Subtract two numbers
+tags: math, arithmetic
+---
+pattern: "compute $a * $b"
+expand: |
+    MOVI R0, ${a}
+    MOVI R1, ${b}
+    IMUL R0, R0, R1
+    HALT
+result: R0
+name: multiplication
+description: Multiply two numbers
+tags: math, arithmetic
+---
+pattern: "compute $a × $b"
+expand: |
+    MOVI R0, ${a}
+    MOVI R1, ${b}
+    IMUL R0, R0, R1
+    HALT
+result: R0
+name: multiplication-alt
+description: Multiply two numbers (× symbol)
+tags: math, arithmetic
+---
+pattern: "compute $a / $b"
+expand: |
+    MOVI R0, ${a}
+    MOVI R1, ${b}
+    IDIV R0, R0, R1
+    HALT
+result: R0
+name: division
+description: Divide two numbers
+tags: math, arithmetic
+---
+pattern: "double $a"
+expand: |
+    MOVI R0, ${a}
+    IADD R0, R0, R0
+    HALT
+result: R0
+name: double
+description: Double a number
+tags: math, arithmetic
+---
+pattern: "square $a"
+expand: |
+    MOVI R0, ${a}
+    IMUL R0, R0, R0
+    HALT
+result: R0
+name: square
+description: Square a number
+tags: math, arithmetic

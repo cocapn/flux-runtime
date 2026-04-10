@@ -255,6 +255,33 @@ def main() -> None:
         help="Maximum execution cycles (default: 100000)",
     )
 
+    # ── flux open ───────────────────────────────────────────────────────────────
+    subparsers.add_parser(
+        "open",
+        help="Start interactive Open-Flux-Interpreter",
+    )
+
+    # ── flux run <file.md> ───────────────────────────────────────────────────────
+    runmd_parser = subparsers.add_parser(
+        "run-md",
+        help="Run a markdown file with embedded FLUX code",
+    )
+    runmd_parser.add_argument(
+        "input",
+        help="Markdown file to execute (.md)",
+    )
+    runmd_parser.add_argument(
+        "--cycles",
+        type=int,
+        default=1_000_000,
+        help="Maximum execution cycles (default: 1000000)",
+    )
+    runmd_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Output results as JSON",
+    )
+
     args = parser.parse_args()
 
     # ── Dispatch ───────────────────────────────────────────────────────────
@@ -297,6 +324,12 @@ def main() -> None:
 
     elif args.command == "debug":
         _cmd_debug(args)
+
+    elif args.command == "open":
+        _cmd_open()
+
+    elif args.command == "run-md":
+        _cmd_run_md(args)
 
     else:
         _show_banner()
@@ -987,6 +1020,58 @@ Initial state:
     shell.cmdloop()
 
 
+def _cmd_open() -> None:
+    """Handle the ``open`` subcommand — interactive Open-Flux-Interpreter."""
+    try:
+        from flux.open_interpreter import interactive
+        interactive()
+    except ImportError as e:
+        print(f"Error: cannot import flux.open_interpreter — {e}", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error: Open-Flux-Interpreter failed — {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def _cmd_run_md(args: argparse.Namespace) -> None:
+    """Handle the ``run-md`` subcommand — run markdown file with FLUX code."""
+    try:
+        from flux.open_interpreter import run_markdown_file
+        import json
+    except ImportError as e:
+        print(f"Error: cannot import flux.open_interpreter — {e}", file=sys.stderr)
+        sys.exit(1)
+
+    result = run_markdown_file(args.input, max_cycles=args.cycles)
+
+    if args.json:
+        print(json.dumps(result.to_dict(), indent=2))
+    else:
+        print(f"Running {args.input}...")
+        print()
+
+        if result.success:
+            print(f"✓ Success!")
+            print(f"  Result: R0 = {result.result}")
+            print(f"  Cycles: {result.cycles}")
+            print(f"  Halted: {result.halted}")
+
+            if result.registers:
+                print(f"\n  Registers:")
+                for reg, val in sorted(result.registers.items()):
+                    print(f"    R{reg} = {val}")
+        else:
+            print(f"✗ Error: {result.error}")
+
+        print()
+        print("Bytecode (hex):")
+        print(f"  {result.bytecode.hex()}")
+
+        print()
+        print("Disassembly:")
+        print(result.disassembly)
+
+
 def _show_banner() -> None:
     """Show the welcome banner when no subcommand is given."""
     banner = r"""
@@ -1005,6 +1090,8 @@ def _show_banner() -> None:
     print("    hello         Run the FLUX hello world demo")
     print("    compile       Compile source code to FLUX bytecode")
     print("    run           Run FLUX bytecode in the VM")
+    print("    run-md        Run markdown file with FLUX code")
+    print("    open          Start interactive Open-Flux-Interpreter")
     print("    test          Run the FLUX test suite")
     print("    version       Print version information")
     print("    demo          Run the synthesis demo")
@@ -1020,6 +1107,8 @@ def _show_banner() -> None:
     print("    flux hello                              Run the hello world demo")
     print("    flux compile file.c -o out.bin           Compile to bytecode")
     print("    flux run out.bin                         Run bytecode in the VM")
+    print("    flux open                                Start Open-Flux-Interpreter")
+    print("    flux run-md file.md                      Run markdown FLUX code")
     print("    flux disasm out.bin                      Disassemble bytecode")
     print("    flux debug out.bin                       Debug bytecode interactively")
     print()

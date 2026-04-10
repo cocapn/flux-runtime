@@ -1,0 +1,56 @@
+---
+pattern: "factorial of $n"
+expand: |
+    MOVI R0, ${n}
+    MOVI R1, 1
+    IMUL R1, R1, R0
+    DEC R0
+    JNZ R0, -10
+    HALT
+result: R1
+name: factorial
+description: Compute n! (factorial of n)
+tags: math, factorial, loop
+---
+pattern: "fibonacci of $n"
+expand: |
+    MOVI R0, 0
+    MOVI R1, 1
+    MOVI R2, ${n}
+    MOV R3, R1
+    IADD R1, R1, R0
+    MOV R0, R3
+    DEC R2
+    JNZ R2, -16
+    HALT
+result: R0
+name: fibonacci
+description: Compute F(n) - returns R0 (use fibonacci-last for R1)
+tags: math, fibonacci, sequence
+---
+pattern: "sum $a to $b"
+expand: |
+    MOVI R0, 0
+    MOVI R1, ${b}
+    IADD R0, R0, R1
+    DEC R1
+    JNZ R1, -10
+    HALT
+result: R0
+name: sum-range
+description: Sum all integers from a to b
+tags: math, sum, loop
+---
+pattern: "power of $base to $exp"
+expand: |
+    MOVI R0, 1
+    MOVI R1, ${base}
+    MOVI R2, ${exp}
+    IMUL R0, R0, R1
+    DEC R2
+    JNZ R2, -10
+    HALT
+result: R0
+name: power
+description: Compute base^exp
+tags: math, power, exponent
