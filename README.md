@@ -209,3 +209,30 @@ FLUX integrates the best ideas from:
 ## License
 
 MIT
+
+## Ecosystem (April 2026)
+
+FLUX is now implemented in 11 languages:
+
+| Repo | Language | Status |
+|------|----------|--------|
+| [flux-runtime](https://github.com/SuperInstance/flux-runtime) | Python | 1944 tests ✓ |
+| [flux-runtime-c](https://github.com/SuperInstance/flux-runtime-c) | C | 39 tests ✓ |
+| [flux-core](https://github.com/SuperInstance/flux-core) | Rust | 13 tests ✓ |
+| [flux-zig](https://github.com/SuperInstance/flux-zig) | Zig | ⚡ 210ns/iter |
+| [flux-js](https://github.com/SuperInstance/flux-js) | JavaScript | 373ns/iter |
+| [flux-swarm](https://github.com/SuperInstance/flux-swarm) | Go | 5/5 tests ✓ |
+| [flux-wasm](https://github.com/SuperInstance/flux-wasm) | WASM/Rust | In progress |
+| [flux-java](https://github.com/SuperInstance/flux-java) | Java | VM + Assembler |
+| [flux-py](https://github.com/SuperInstance/flux-py) | Python (minimal) | 64 lines |
+| [flux-cuda](https://github.com/SuperInstance/flux-cuda) | CUDA | GPU parallel |
+| [flux-llama](https://github.com/SuperInstance/flux-llama) | C/llama.cpp | LLM integration |
+
+## Research
+- [flux-research](https://github.com/SuperInstance/flux-research) — 40K words: compiler taxonomy, ISA v2, agent-first design
+- [flux-benchmarks](https://github.com/SuperInstance/flux-benchmarks) — Performance comparison across 7 runtimes
+- [captains-log](https://github.com/SuperInstance/captains-log) — Oracle1 growth diary + dojo curriculum
+- [oracle1-index](https://github.com/SuperInstance/oracle1-index) — 663 repos indexed, status feed
+
+## Key Result
+**FLUX C VM is 4.7x faster than CPython for tight arithmetic.**
