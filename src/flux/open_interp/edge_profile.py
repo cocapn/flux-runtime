@@ -1,0 +1,169 @@
+"""
+Edge Profile — FLUX vocabulary optimized for constrained hardware.
+
+This module generates a self-contained Python runtime that fits on an
+8GB ARM device (Jetson Super Orin Nano). It's a test case for I2I
+collaboration: Oracle1 builds the pruning, JetsonClaw1 tests on hardware.
+
+I2I Context:
+    [I2I:TASK] jetsonclaw1 — test edge_profile on Jetson hardware
+    Artifact: this file
+    Acceptance criteria: runs in <512MB RAM, <100ms per vocab lookup
+"""
+from typing import List, Dict, Optional
+from dataclasses import dataclass
+import json
+
+
+@dataclass
+class EdgeConstraints:
+    """Hardware constraints for edge deployment."""
+    max_ram_mb: int = 512       # Target RAM ceiling
+    max_vocab: int = 50         # Max vocabulary entries
+    max_pattern_len: int = 128  # Max pattern string length
+    no_loops: bool = False      # Can this device handle loop constructs?
+    no_float: bool = False      # Integer-only device?
+    arch: str = "arm64"         # Target architecture
+    has_gpu: bool = False       # GPU available?
+    
+    # Jetson Super Orin Nano defaults
+    @classmethod
+    def jetson_orin(cls) -> 'EdgeConstraints':
+        return cls(
+            max_ram_mb=512,
+            max_vocab=50,
+            max_pattern_len=128,
+            no_loops=False,
+            no_float=False,
+            arch="arm64",
+            has_gpu=True,  # Jetson has CUDA
+        )
+    
+    @classmethod
+    def embedded_minimal(cls) -> 'EdgeConstraints':
+        return cls(
+            max_ram_mb=64,
+            max_vocab=20,
+            max_pattern_len=64,
+            no_loops=True,
+            no_float=True,
+            arch="armv7",
+            has_gpu=False,
+        )
+
+
+class EdgeProfiler:
+    """
+    Generates edge-optimized vocabulary profiles.
+    
+    Takes a full vocabulary and hardware constraints, outputs
+    a pruned profile with only what fits.
+    """
+    
+    def __init__(self, constraints: EdgeConstraints):
+        self.constraints = constraints
+    
+    def profile(self, vocab) -> dict:
+        """Generate an edge profile from a full vocabulary."""
+        entries = vocab.entries if hasattr(vocab, 'entries') else vocab
+        
+        # Categorize entries
+        essential = []  # Must have (compute, store, halt)
+        useful = []     # Nice to have (math, logic)
+        luxury = []     # Only if space (domain-specific)
+        
+        for entry in entries:
+            name = getattr(entry, 'name', '')
+            tags = getattr(entry, 'tags', [])
+            pattern = getattr(entry, 'pattern', '')
+            
+            # Skip if pattern too long
+            if len(pattern) > self.constraints.max_pattern_len:
+                continue
+            
+            # Skip loops if constrained
+            if self.constraints.no_loops and 'loop' in str(tags):
+                continue
+            
+            # Skip float ops if constrained
+            if self.constraints.no_float and any(t in str(tags) for t in ['float', 'decimal']):
+                continue
+            
+            # Categorize
+            if any(t in str(tags) for t in ['essential', 'core', 'primitive']):
+                essential.append(name)
+            elif any(t in str(tags) for t in ['math', 'arithmetic', 'logic']):
+                useful.append(name)
+            else:
+                luxury.append(name)
+        
+        # Fit within budget
+        budget = self.constraints.max_vocab
+        selected = essential[:budget]
+        remaining = budget - len(selected)
+        if remaining > 0:
+            selected.extend(useful[:remaining])
+            remaining = budget - len(selected)
+        if remaining > 0:
+            selected.extend(luxury[:remaining])
+        
+        # Estimate memory
+        estimated_ram = len(selected) * 2  # ~2KB per entry
+        
+        return {
+            "constraints": {
+                "arch": self.constraints.arch,
+                "max_ram_mb": self.constraints.max_ram_mb,
+                "has_gpu": self.constraints.has_gpu,
+            },
+            "selected": selected,
+            "total": len(entries),
+            "selected_count": len(selected),
+            "pruned_count": len(entries) - len(selected),
+            "estimated_ram_kb": estimated_ram,
+            "fits": estimated_ram < self.constraints.max_ram_mb * 1024,
+            "pruning_ratio": len(selected) / len(entries) if entries else 1.0,
+        }
+    
+    def generate_standalone(self, vocab, output_path: str) -> str:
+        """Generate a standalone Python file with only the selected vocabulary."""
+        profile = self.profile(vocab)
+        selected_names = set(profile["selected"])
+        
+        lines = [
+            '"""',
+            f'FLUX Edge Runtime — auto-generated',
+            f'Architecture: {self.constraints.arch}',
+            f'Vocab: {len(selected_names)} entries',
+            f'RAM budget: {self.constraints.max_ram_mb}MB',
+            f'Generated by EdgeProfiler',
+            '"""',
+            '',
+            'VOCAB = {}',
+        ]
+        
+        entries = vocab.entries if hasattr(vocab, 'entries') else vocab
+        for entry in entries:
+            name = getattr(entry, 'name', '')
+            if name in selected_names:
+                pattern = getattr(entry, 'pattern', '')
+                bytecode = getattr(entry, 'bytecode_template', '')
+                lines.append(f'VOCAB["{name}"] = {{"pattern": "{pattern}", "bytecode": "{bytecode}"}}')
+        
+        lines.append('')
+        lines.append('def lookup(text):')
+        lines.append('    for name, entry in VOCAB.items():')
+        lines.append('        if any(w in text.lower() for w in entry["pattern"].split()):')
+        lines.append('            return name, entry')
+        lines.append('    return None, None')
+        lines.append('')
+        lines.append('if __name__ == "__main__":')
+        lines.append('    import sys')
+        lines.append('    name, entry = lookup(" ".join(sys.argv[1:]))')
+        lines.append('    print(f"Matched: {name}" if name else "No match")')
+        
+        output = '\n'.join(lines)
+        with open(output_path, 'w') as f:
+            f.write(output)
+        
+        return output_path
