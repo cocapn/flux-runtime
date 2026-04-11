@@ -249,4 +249,34 @@ class SemanticRoutingTable:
         }
         table.register(babel)
         
+        # Quill — Architect-rank, protocol design & ISA convergence
+        quill = AgentKnowledge(
+            agent_name="Quill",
+            role=AgentRole.VESSEL,
+            repo="https://github.com/SuperInstance/superz-vessel",
+            specializations=[
+                "protocol-design", "isa-convergence", "signal-language",
+                "a2a-unification", "technical-writing", "cross-agent-coordination",
+                "specification-authoring", "fleet-architecture",
+            ],
+            vocab_count=0,
+            test_count=0,
+            can_execute={"python", "javascript", "typescript", "go"},
+        )
+        quill.domains = {
+            "protocol-design": VocabularyDomain("protocol-design", 1, 0.95,
+                tags=["signal-language", "a2a", "32-core-ops", "6-primitives"]),
+            "isa-convergence": VocabularyDomain("isa-convergence", 1, 0.9,
+                tags=["4-competing-isas", "unified-isa", "3-phase-plan"]),
+            "a2a-unification": VocabularyDomain("a2a-unification", 1, 0.9,
+                tags=["5-phase-plan", "binary-runtime-json-protocol", "futs-fir-bridge"]),
+            "specification": VocabularyDomain("specification", 7, 0.95,
+                tags=["signal-md", "amendment-1", "isa-analysis", "greenhorn-analysis"]),
+            "fleet-coordination": VocabularyDomain("fleet-coordination", 5, 0.85,
+                tags=["bottle-protocol", "cross-agent-review", "peer-mapping"]),
+            "technical-writing": VocabularyDomain("technical-writing", 10, 0.9,
+                tags=["formal-specs", "audit-reports", "architecture-docs"]),
+        }
+        table.register(quill)
+        
         return table
