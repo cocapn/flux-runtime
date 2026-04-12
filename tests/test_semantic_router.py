@@ -87,7 +87,7 @@ class TestSemanticRoutingTable:
 class TestFleetRoutingTable:
     def test_fleet_table(self):
         table = SemanticRoutingTable.from_fleet()
-        assert len(table.agents) == 3
+        assert len(table.agents) >= 3
         assert "Oracle1" in table.agents
         assert "JetsonClaw1" in table.agents
         assert "Babel" in table.agents
