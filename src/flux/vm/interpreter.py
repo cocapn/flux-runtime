@@ -1016,7 +1016,20 @@ class Interpreter:
             rd, rs1, rs2 = self._decode_operands_E()
             v1 = self.regs.read_gp(rs1)
             v2 = self.regs.read_gp(rs2)
-            self.regs.write_gp(rd, (v1 + v2) // 2)
+            # Confidence-weighted merge if engine available
+            if hasattr(self, '_evo_engine') and self._evo_engine.behaviors:
+                b1 = self._evo_engine.behaviors.get(f"r{rs1}")
+                b2 = self._evo_engine.behaviors.get(f"r{rs2}")
+                if b1 and b2:
+                    w1 = b1.score if b1.score > 0 else 0.5
+                    w2 = b2.score if b2.score > 0 else 0.5
+                    total = w1 + w2
+                    result = int((v1 * w1 + v2 * w2) / total)
+                else:
+                    result = (v1 + v2) // 2
+            else:
+                result = (v1 + v2) // 2
+            self.regs.write_gp(rd, result)
             return
         if opcode_byte == Op.RESTORE:
             rd, imm = self._decode_operands_D()
@@ -1360,7 +1373,16 @@ class Interpreter:
             return
         if opcode_byte == Op.WITNESS:
             rd, imm = self._decode_operands_D()
-            self.regs.write_gp(rd, 1)
+            # Log a witness mark
+            if not hasattr(self, '_witness_log'):
+                self._witness_log = []
+            self._witness_log.append({
+                'pc': self.pc - 4,  # start of this instruction
+                'rd': rd,
+                'imm': imm,
+                'cycle': self.cycle_count
+            })
+            self.regs.write_gp(rd, len(self._witness_log))  # witness count
             return
         if opcode_byte == Op.SNAPSHOT:
             rd, imm = self._decode_operands_D()
