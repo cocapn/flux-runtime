@@ -28,7 +28,7 @@ Usage:
         interval_minutes=15,
         on_find="commit",
         notify_channel="none",
-        filter_pattern=r"\[I2I:",
+        filter_pattern="\x5bI2I:",
     ))
     
     # Run all due sweeps
