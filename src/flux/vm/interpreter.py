@@ -20,6 +20,7 @@ has been fetched (i.e. PC already points past the instruction).
 
 from __future__ import annotations
 
+import math
 import struct
 from typing import Callable, Optional
 
@@ -141,6 +142,9 @@ class Interpreter:
         # Call stack for ENTER/LEAVE frame tracking
         self._frame_stack: list[int] = []  # stack of saved SP values
 
+        # Capability tracking for CAP_REQUIRE / CAP_GRANT / CAP_REVOKE
+        self.capabilities: set[int] = set()
+
         # Create default memory regions
         self.memory.create_region("stack", memory_size, "system")
         self.memory.create_region("heap", memory_size, "system")
@@ -150,11 +154,31 @@ class Interpreter:
 
     # ── Public API ─────────────────────────────────────────────────────────
 
+    MAX_BYTECODE_SIZE = 1_048_576  # 1 MB max bytecode size
+
+    @staticmethod
+    def verify_bytecode(bytecode: bytes) -> None:
+        """Validate bytecode before execution.
+
+        Raises:
+            ValueError: If bytecode is empty, too large, or invalid.
+        """
+        if not bytecode or len(bytecode) == 0:
+            raise ValueError(
+                "Bytecode verification failed: bytecode is empty"
+            )
+        if len(bytecode) > Interpreter.MAX_BYTECODE_SIZE:
+            raise ValueError(
+                f"Bytecode verification failed: bytecode size {len(bytecode)} "
+                f"exceeds maximum {Interpreter.MAX_BYTECODE_SIZE} bytes"
+            )
+
     def execute(self) -> int:
         """Execute bytecode until HALT, cycle budget exceeded, or error.
 
         Returns the total number of cycles consumed.
         """
+        self.verify_bytecode(self.bytecode)
         self.running = True
         while self.running and not self.halted and self.cycle_count < self.max_cycles:
             self._step()
@@ -179,6 +203,7 @@ class Interpreter:
         self._box_counter = 0
         self._resources.clear()
         self._frame_stack.clear()
+        self.capabilities.clear()
 
     def dump_state(self) -> dict:
         """Return a serializable snapshot of the full VM state."""
@@ -1281,25 +1306,48 @@ class Interpreter:
         # ── A2A Capability: CAP_REQUIRE ────────────────────────────────────
         if opcode_byte == Op.CAP_REQUIRE:
             data = self._fetch_var_data()
-            self._dispatch_a2a("CAP_REQUIRE", data)
+            # Enforce capability: check if the required cap is in the set
+            if len(data) >= 4:
+                cap_id = struct.unpack_from('<I', data, 0)[0]
+                if cap_id not in self.capabilities:
+                    raise VMA2AError(
+                        f"CAP_REQUIRE: capability {cap_id} not granted",
+                        opcode=opcode_byte,
+                        pc=start_pc,
+                    )
+                self.regs.write_gp(0, 0)  # success
+            else:
+                self.regs.write_gp(0, 1)  # failure
             return
 
         # ── A2A Capability: CAP_REQUEST ────────────────────────────────────
         if opcode_byte == Op.CAP_REQUEST:
             data = self._fetch_var_data()
+            # CAP_REQUEST is a signal to an external handler; forward but
+            # do not auto-grant.  The handler decides.
             self._dispatch_a2a("CAP_REQUEST", data)
             return
 
         # ── A2A Capability: CAP_GRANT ──────────────────────────────────────
         if opcode_byte == Op.CAP_GRANT:
             data = self._fetch_var_data()
-            self._dispatch_a2a("CAP_GRANT", data)
+            if len(data) >= 4:
+                cap_id = struct.unpack_from('<I', data, 0)[0]
+                self.capabilities.add(cap_id)
+                self.regs.write_gp(0, 0)  # success
+            else:
+                self.regs.write_gp(0, 1)  # failure
             return
 
         # ── A2A Capability: CAP_REVOKE ─────────────────────────────────────
         if opcode_byte == Op.CAP_REVOKE:
             data = self._fetch_var_data()
-            self._dispatch_a2a("CAP_REVOKE", data)
+            if len(data) >= 4:
+                cap_id = struct.unpack_from('<I', data, 0)[0]
+                self.capabilities.discard(cap_id)
+                self.regs.write_gp(0, 0)  # success
+            else:
+                self.regs.write_gp(0, 1)  # failure
             return
 
         # ── A2A Synchronization: BARRIER ───────────────────────────────────

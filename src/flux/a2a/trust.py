@@ -147,13 +147,33 @@ class TrustEngine:
             How well the capability matched expectations (0.0–1.0).
         behavior_signature : float
             Metric of behavioral consistency.
+
+        Raises
+        ------
+        ValueError
+            If *capability_match* or *behavior_signature* is NaN.
         """
+        # Reject NaN values to prevent trust poisoning (Issue #17)
+        if math.isnan(capability_match):
+            raise ValueError(
+                "capability_match must not be NaN"
+            )
+        if math.isnan(behavior_signature):
+            raise ValueError(
+                "behavior_signature must not be NaN"
+            )
+        if math.isnan(latency_ms):
+            raise ValueError(
+                "latency_ms must not be NaN"
+            )
+        # Clamp trust-related floats to [0.0, 1.0]
+        capability_match = max(0.0, min(1.0, capability_match))
         profile = self._get_profile(agent_a, agent_b)
         record = InteractionRecord(
             timestamp=time.time(),
             success=success,
             latency_ms=latency_ms,
-            capability_match=max(0.0, min(1.0, capability_match)),
+            capability_match=capability_match,
             behavior_signature=behavior_signature,
         )
         profile.history.append(record)
@@ -192,7 +212,17 @@ class TrustEngine:
         return max(0.0, min(1.0, composite * decay))
 
     def check_trust(self, agent_a: str, agent_b: str, threshold: float) -> bool:
-        """Check if trust from *agent_a* to *agent_b* meets *threshold*."""
+        """Check if trust from *agent_a* to *agent_b* meets *threshold*.
+
+        Raises
+        ------
+        ValueError
+            If *threshold* is NaN.
+        """
+        if math.isnan(threshold):
+            raise ValueError("threshold must not be NaN")
+        # Clamp threshold to [0.0, 1.0]
+        threshold = max(0.0, min(1.0, threshold))
         return self.compute_trust(agent_a, agent_b) >= threshold
 
     def revoke_trust(self, agent_a: str, agent_b: str) -> None:
