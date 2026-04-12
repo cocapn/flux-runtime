@@ -555,7 +555,7 @@ class Interpreter:
                 9: (a & 0xFFFFFFFF) >= (b_val & 0xFFFFFFFF), # UGE
             }
             result = 1 if conditions.get(cond, False) else 0
-            self.regs.write_gp(0, result)
+            self.regs.write_gp(rs1, result)
             self._set_flags(result)
             return
 

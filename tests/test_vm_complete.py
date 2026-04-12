@@ -112,77 +112,131 @@ class TestRotateOps:
 
 class TestComparisonOps:
     def test_icmp_eq(self):
-        """ICMP: equal comparison returns 1 in R0."""
-        # ICMP format: [ICMP][cond:u8][a_reg:u8][b_reg:u8] — cond 0 = EQ
+        """ICMP: equal comparison writes result to destination register (rd)."""
+        # ICMP format: [ICMP][cond:u8][rd:u8][rs:u8] — cond 0 = EQ
         bc = bytes([
             Op.MOVI, 1, *_i16(5),
             Op.MOVI, 2, *_i16(5),
-            Op.ICMP, 0, 1, 2,  # cond=EQ(0), a=R1(5), b=R2(5) -> True
+            Op.ICMP, 0, 1, 2,  # cond=EQ(0), rd=R1, rs=R2 -> R1 = 1
             Op.HALT,
         ])
         vm = _make_vm(bc)
         vm.execute()
-        assert vm.regs.read_gp(0) == 1
+        assert vm.regs.read_gp(1) == 1
 
     def test_icmp_ne(self):
         """ICMP: not-equal comparison."""
         bc = bytes([
             Op.MOVI, 1, *_i16(5),
             Op.MOVI, 2, *_i16(3),
-            Op.ICMP, 1, 1, 2,  # cond=NE(1), a=R1(5), b=R2(3) -> True
+            Op.ICMP, 1, 1, 2,  # cond=NE(1), rd=R1, rs=R2 -> R1 = 1
             Op.HALT,
         ])
         vm = _make_vm(bc)
         vm.execute()
-        assert vm.regs.read_gp(0) == 1
+        assert vm.regs.read_gp(1) == 1
 
     def test_icmp_lt(self):
         """ICMP: less-than comparison."""
         bc = bytes([
             Op.MOVI, 1, *_i16(3),
             Op.MOVI, 2, *_i16(5),
-            Op.ICMP, 2, 1, 2,  # cond=LT(2), a=R1(3), b=R2(5) -> True
+            Op.ICMP, 2, 1, 2,  # cond=LT(2), rd=R1, rs=R2 -> R1 = 1
             Op.HALT,
         ])
         vm = _make_vm(bc)
         vm.execute()
-        assert vm.regs.read_gp(0) == 1
+        assert vm.regs.read_gp(1) == 1
 
     def test_icmp_gt(self):
         """ICMP: greater-than comparison."""
         bc = bytes([
             Op.MOVI, 1, *_i16(10),
             Op.MOVI, 2, *_i16(5),
-            Op.ICMP, 4, 1, 2,  # cond=GT(4), a=R1(10), b=R2(5) -> True
+            Op.ICMP, 4, 1, 2,  # cond=GT(4), rd=R1, rs=R2 -> R1 = 1
             Op.HALT,
         ])
         vm = _make_vm(bc)
         vm.execute()
-        assert vm.regs.read_gp(0) == 1
+        assert vm.regs.read_gp(1) == 1
 
     def test_icmp_false(self):
         """ICMP: comparison that is false returns 0."""
         bc = bytes([
             Op.MOVI, 1, *_i16(3),
             Op.MOVI, 2, *_i16(5),
-            Op.ICMP, 4, 1, 2,  # cond=GT(4), a=R1(3), b=R2(5) -> False
+            Op.ICMP, 4, 1, 2,  # cond=GT(4), rd=R1, rs=R2 -> R1 = 0
             Op.HALT,
         ])
         vm = _make_vm(bc)
         vm.execute()
-        assert vm.regs.read_gp(0) == 0
+        assert vm.regs.read_gp(1) == 0
 
     def test_icmp_le(self):
         """ICMP: less-than-or-equal."""
         bc = bytes([
             Op.MOVI, 1, *_i16(5),
             Op.MOVI, 2, *_i16(5),
-            Op.ICMP, 3, 1, 2,  # cond=LE(3), a=R1(5), b=R2(5) -> True
+            Op.ICMP, 3, 1, 2,  # cond=LE(3), rd=R1, rs=R2 -> R1 = 1
             Op.HALT,
         ])
         vm = _make_vm(bc)
         vm.execute()
-        assert vm.regs.read_gp(0) == 1
+        assert vm.regs.read_gp(1) == 1
+
+    def test_icmp_writes_to_dest_register_not_r0(self):
+        """ICMP: result goes to the destination register, NOT R0 (issue #11)."""
+        # ICMP format: [ICMP][cond:u8][rd/rs1:u8][rs2:u8] — 4 bytes total
+        bc = bytes([
+            Op.MOVI, 3, *_i16(5),   # R3 = 5
+            Op.MOVI, 1, *_i16(5),   # R1 = 5
+            Op.MOVI, 0, *_i16(99),  # R0 = 99 (should NOT be overwritten)
+            Op.ICMP, 0, 3, 1,       # cond=EQ(0), rd=R3, rs=R1 -> R3 = (5==5) ? 1 : 0 = 1
+            Op.HALT,
+        ])
+        vm = _make_vm(bc)
+        vm.execute()
+        assert vm.regs.read_gp(3) == 1   # result in R3 (destination register)
+        assert vm.regs.read_gp(0) == 99  # R0 unchanged
+
+    def test_icmp_dest_register_r5(self):
+        """ICMP: result goes to R5 when specified."""
+        bc = bytes([
+            Op.MOVI, 5, *_i16(3),   # R5 = 3
+            Op.MOVI, 2, *_i16(7),   # R2 = 7
+            Op.ICMP, 2, 5, 2,       # cond=LT(2), rd=R5, rs=R2 -> R5 = (3<7) ? 1 : 0 = 1
+            Op.HALT,
+        ])
+        vm = _make_vm(bc)
+        vm.execute()
+        assert vm.regs.read_gp(5) == 1   # result in R5
+        assert vm.regs.read_gp(0) == 0   # R0 untouched
+
+    def test_icmp_false_does_not_clobber_r0(self):
+        """ICMP: false comparison does not clobber R0."""
+        bc = bytes([
+            Op.MOVI, 0, *_i16(77),  # R0 = 77
+            Op.MOVI, 4, *_i16(10),  # R4 = 10
+            Op.MOVI, 1, *_i16(5),   # R1 = 5
+            Op.ICMP, 2, 4, 1,       # cond=LT(2), rd=R4, rs=R1 -> R4 = (10<5) ? 1 : 0 = 0
+            Op.HALT,
+        ])
+        vm = _make_vm(bc)
+        vm.execute()
+        assert vm.regs.read_gp(4) == 0   # result in R4
+        assert vm.regs.read_gp(0) == 77  # R0 untouched
+
+    def test_icmp_ge_unsigned(self):
+        """ICMP: unsigned GE comparison."""
+        bc = bytes([
+            Op.MOVI, 1, *_i16(5),
+            Op.MOVI, 2, *_i16(3),
+            Op.ICMP, 9, 1, 2,  # cond=UGE(9), rd=R1, rs=R2 -> R1 = 1
+            Op.HALT,
+        ])
+        vm = _make_vm(bc)
+        vm.execute()
+        assert vm.regs.read_gp(1) == 1
 
     def test_test_nonzero(self):
         """TEST: sets zero flag if AND result is zero."""
