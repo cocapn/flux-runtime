@@ -140,6 +140,17 @@ class Op(IntEnum):
     FORMATION_UPDATE = 0x7A
     EMERGENCY_STOP = 0x7B
 
+    # ISA v3 — Agent Evolution & Instinct (0x7C-0x7F)
+    EVOLVE = 0x7C          # Trigger evolution cycle (hooks to flux-evolve)
+    INSTINCT = 0x7D       # Execute instinct-based action
+    WITNESS = 0x7E        # Write witness mark to commit log
+    SNAPSHOT = 0x7F       # Save full VM state to named region
+
+    # ISA v3 — Meta (0x3D-0x3F) — free slots in control flow
+    CONF = 0x3D           # Attach confidence to previous result
+    MERGE = 0x3E          # Weighted merge of two registers by confidence
+    RESTORE = 0x3F        # Restore VM state from named region
+
     # System (0x80-0x9F)
     HALT = 0x80
     YIELD = 0x81

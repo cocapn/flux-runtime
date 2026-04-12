@@ -1008,6 +1008,20 @@ class Interpreter:
                 )
             return
 
+        # ── ISA v3: Confidence ops (0x3D-0x3F) ───────────────────────────
+        if opcode_byte == Op.CONF:
+            rd, conf_raw = self._decode_operands_C()
+            return
+        if opcode_byte == Op.MERGE:
+            rd, rs1, rs2 = self._decode_operands_E()
+            v1 = self.regs.read_gp(rs1)
+            v2 = self.regs.read_gp(rs2)
+            self.regs.write_gp(rd, (v1 + v2) // 2)
+            return
+        if opcode_byte == Op.RESTORE:
+            rd, imm = self._decode_operands_C()
+            return
+
         # ── Float Arithmetic ───────────────────────────────────────────────
         if opcode_byte == Op.FADD:
             fd, fs1, fs2 = self._decode_operands_E()
@@ -1326,6 +1340,23 @@ class Interpreter:
             self.running = False
             self.halted = True
             self._dispatch_a2a("EMERGENCY_STOP", b"")
+            return
+
+        # ── ISA v3: Evolution & Meta (0x7C-0x7F) ───────────────────────────
+        if opcode_byte == Op.EVOLVE:
+            rd, imm = self._decode_operands_C()
+            self.regs.write_gp(rd, imm)
+            return
+        if opcode_byte == Op.INSTINCT:
+            rd, imm = self._decode_operands_C()
+            self.regs.write_gp(rd, imm)
+            return
+        if opcode_byte == Op.WITNESS:
+            rd, imm = self._decode_operands_C()
+            self.regs.write_gp(rd, 1)
+            return
+        if opcode_byte == Op.SNAPSHOT:
+            rd, imm = self._decode_operands_C()
             return
 
         # ═══════════════════════════════════════════════════════════════════
