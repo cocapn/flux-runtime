@@ -172,15 +172,15 @@ TEST_VECTORS = [
     },
 
     # =========================================================================
-    # Category: Stack Operations (0x50-0x5F range for stack ops varies by ISA)
+    # Category: Stack Operations (0x0C-0x0D, Format B)
     # =========================================================================
     {
         "name": "PUSH and POP preserve value",
-        "bytecode": [0x18, 0, 99, 0x08, 0, 0x09, 1, 0x00],
-        # MOVI R0,99; PUSH R0; POP R1; HALT
+        "bytecode": [0x18, 0, 99, 0x0C, 0, 0x0D, 1, 0x00],
+        # MOVI R0,99; PUSH R0; POP R1; HALT  (PUSH=0x0C, POP=0x0D per unified ISA)
         "expected": {"register": 1, "value": 99},
         "category": "stack",
-        "notes": "PUSH (0x08) and POP (0x09) should preserve values exactly. R1 should equal R0 after push/pop cycle.",
+        "notes": "PUSH (0x0C) and POP (0x0D) should preserve values exactly. R1 should equal R0 after push/pop cycle.",
     },
 
     # =========================================================================
@@ -209,21 +209,21 @@ TEST_VECTORS = [
     },
 
     # =========================================================================
-    # Category: Increment / Decrement (0x04-0x05 or similar, format varies)
+    # Category: Increment / Decrement (0x08-0x09, Format B)
     # =========================================================================
     {
         "name": "INC increments register",
-        "bytecode": [0x18, 0, 41, 0x04, 0, 0x00],  # MOVI R0,41; INC R0; HALT
+        "bytecode": [0x18, 0, 41, 0x08, 0, 0x00],  # MOVI R0,41; INC R0; HALT (INC=0x08 per unified ISA)
         "expected": {"register": 0, "value": 42},
         "category": "arithmetic",
-        "notes": "INC (0x04): R0 = R0 + 1 = 41 + 1 = 42. Format B: opcode, rd.",
+        "notes": "INC (0x08): R0 = R0 + 1 = 41 + 1 = 42. Format B: opcode, rd.",
     },
     {
         "name": "DEC decrements register",
-        "bytecode": [0x18, 0, 43, 0x05, 0, 0x00],  # MOVI R0,43; DEC R0; HALT
+        "bytecode": [0x18, 0, 43, 0x09, 0, 0x00],  # MOVI R0,43; DEC R0; HALT (DEC=0x09 per unified ISA)
         "expected": {"register": 0, "value": 42},
         "category": "arithmetic",
-        "notes": "DEC (0x05): R0 = R0 - 1 = 43 - 1 = 42.",
+        "notes": "DEC (0x09): R0 = R0 - 1 = 43 - 1 = 42.",
     },
 
     # =========================================================================
