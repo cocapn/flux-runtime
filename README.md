@@ -12,6 +12,7 @@
      Fluid Language Universal eXecution
   </pre>
   <p><strong>A self-assembling, self-improving runtime that compiles markdown to bytecode.</strong></p>
+[![Benchmark](https://github.com/SuperInstance/flux-runtime/actions/workflows/benchmark.yml/badge.svg)](https://github.com/SuperInstance/flux-runtime/actions/workflows/benchmark.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
   <p>
     <code>pip install flux-runtime</code> &nbsp;·&nbsp;
     <a href="https://github.com/SuperInstance/flux-runtime">GitHub</a> &nbsp;·&nbsp;
