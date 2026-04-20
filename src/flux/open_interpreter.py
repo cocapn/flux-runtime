@@ -610,7 +610,7 @@ class OpenFluxInterpreter:
         try:
             result = int(eval(expr, {"__builtins__": {}}))
             return struct.pack("<BBh", Op.MOVI, 0, result)
-        except:
+        except (ValueError, TypeError, struct.error, SyntaxError):
             return b""
 
     def _generate_factorial(self, n: int) -> bytes:

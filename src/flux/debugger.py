@@ -497,7 +497,7 @@ class FluxDebugger(Interpreter):
             try:
                 val = struct.unpack_from("<i", stack_region.data, addr)[0]
                 values.append(val)
-            except:
+            except (struct.error, IndexError, OSError):
                 break
         return values
 

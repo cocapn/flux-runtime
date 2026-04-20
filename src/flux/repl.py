@@ -172,7 +172,7 @@ class FluxREPL:
                         # Note: This assumes memory is accessible via some interface
                         # For now, we'll use a placeholder
                         chunk += b'\x00'
-                    except:
+                    except (IndexError, OSError):
                         chunk += b'?'
                 else:
                     break

@@ -626,7 +626,7 @@ class NativeBridge:
                 try:
                     _sig = _ins.signature(fn)
                     _variadic = any(p.kind == _ins.Parameter.VAR_POSITIONAL for p in _sig.parameters.values())
-                except:
+                except (ValueError, TypeError):
                     _variadic = False
                 
                 if _variadic:
